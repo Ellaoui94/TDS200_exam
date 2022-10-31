@@ -1,0 +1,7 @@
+{
+  "name": "TDS200_h22_ditt-1152",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
