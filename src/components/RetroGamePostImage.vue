@@ -4,7 +4,6 @@ import {IonSlide} from "@ionic/vue";
 
 interface Props{
   imageId: string
-  userAccessToken: string
 }
 
 const props = defineProps<Props>();
@@ -13,7 +12,7 @@ const props = defineProps<Props>();
 
 <template>
   <ion-slide>
-  <img :src="`https://7qp4jl4l.directus.app/assets/${imageId}?access_token=${userAccessToken}`"/>
+  <img :src="`https://7qp4jl4l.directus.app/assets/${imageId}`"/>
   </ion-slide>
 </template>
 

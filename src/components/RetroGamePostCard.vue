@@ -20,7 +20,6 @@ interface Props {
       ]
     }
   },
-  userAccessToken: string
 }
 
 const props = defineProps<Props>()
@@ -29,7 +28,7 @@ const props = defineProps<Props>()
 <template>
   <ion-card>
     <ion-slides>
-    <retro-game-post-image v-for="image in post.images" :key="image.id" :image-id="image.directus_files_id.id" :user-access-token="userAccessToken"/>
+    <retro-game-post-image v-for="image in post.images" :key="image.id" :image-id="image.directus_files_id.id"/>
     </ion-slides>
       <ion-card-header>
       <ion-card-subtitle>{{post.location.coordinates}}</ion-card-subtitle>

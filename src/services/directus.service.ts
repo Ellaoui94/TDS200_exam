@@ -6,6 +6,7 @@ export const directus = new Directus("https://7qp4jl4l.directus.app/", {
     }
 })
 
+
 export const authService = {
     async login(email: string, password: string){
         return await directus.auth.login({email, password})

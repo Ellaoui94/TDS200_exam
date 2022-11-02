@@ -30,7 +30,7 @@ import { GoogleMap } from '@capacitor/google-maps';
 
 const userAccessToken = localStorage.getItem('auth_token');
 
-const retroGamePosts = ref([]);
+const retroGamePosts = ref<IRetroGamePosts>([]);
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
@@ -117,7 +117,7 @@ const createMap = async () => {
                                refreshing-text="Refreshing..."></ion-refresher-content>
       </ion-refresher>
 
-      <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post" :user-access-token="userAccessToken"/>
+      <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post"/>
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button>
