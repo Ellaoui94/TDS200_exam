@@ -47,16 +47,27 @@ const login = async () => {
 
 const register = async () => {
   try {
-    const avatarId = userDetails.value.avatar.id.substring(27)
-    await authService.register(userDetails.value.firstName, userDetails.value.email, userDetails.value.password)
-    /*else {
-      const defaultPic = "/assets/defaultUser.png"
+    let res = await fetch(userDetails.value.avatar.id)
+
+    // if statement not working as I want it to
+    if (!res) {
+      const defaultImg = document.createElement('img');
+      defaultImg.src = "public/assets/defaultUser.png";
+      res = await fetch(defaultImg.src)
+      const imgBlob = await res.blob();
       const formData = new FormData();
-      formData.append('file', defaultPic);
+      formData.append('file', imgBlob);
       const fileUpload = await directus.files.createOne(formData)
 
-      await authService.register(userDetails.value.firstName, userDetails.value.email, userDetails.value.password, userDetails.value.avatar.id = fileUpload?.id );
-    }*/
+      await authService.register(userDetails.value.firstName, userDetails.value.email, userDetails.value.password, fileUpload?.id);
+    } else {
+      const imgBlob = await res.blob();
+      const formData = new FormData();
+      formData.append('file', imgBlob);
+      const fileUpload = await directus.files.createOne(formData);
+
+      await authService.register(userDetails.value.firstName, userDetails.value.email, userDetails.value.password, fileUpload?.id)
+    }
     await login();
   } catch (e) {
     await (await toastController.create({
