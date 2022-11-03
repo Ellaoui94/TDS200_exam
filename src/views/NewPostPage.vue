@@ -4,46 +4,82 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonGrid,
   IonHeader,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonPage,
+  IonRow,
   IonTextarea,
   IonTitle,
   IonToolbar
 } from "@ionic/vue";
 import {Camera, CameraResultType} from "@capacitor/camera";
 import {directus} from "@/services/directus.service";
+import {ref} from "vue";
+import RetroGameNewPostImages from "@/components/RetroGameNewPostImages.vue";
+import {Geolocation} from '@capacitor/geolocation';
 
-const postNewCampSpot = async () => {
+const newRetroGamePost = ref({
+  title: '',
+  description: '',
+  images: {},
+  location: {
+    type: '',
+    coordinates: []
+  },
+})
+
+const newRetroGamePostImages = ref([]);
+
+const postNewRetroGame = async () => {
   /*if (!campingSpot.image) {
     alert("BILDE REQUIRED")
     return;
   }*/
-
-  try {
-    const res = await fetch("")
+ const test = newRetroGamePostImages.value.map(async (image) => {
+    const res = await fetch(image)
     const imgBlob = await res.blob();
-
     const formData = new FormData();
     formData.append('file', imgBlob);
     const fileUpload = await directus.files.createOne(formData)
-
-    if (fileUpload){
-      await directus.items('camping_spots').createOne({
-        title: "",
-        description: "",
-        hashtags: "",
-        image: fileUpload.id
-      })
+   return {
+      directus_files_id: {
+        id: fileUpload.id
+      }
     }
-  }catch (e) {
+  })
+  newRetroGamePost.value.images = [...await Promise.all(test)];
+  try {
+    await directus.items('retroGames_posts').createOne({
+      title: newRetroGamePost.value.title,
+      description: newRetroGamePost.value.description,
+      images: newRetroGamePost.value.images,
+      location: newRetroGamePost.value.location
+    })
+  } catch (e) {
     console.error(e)
   }
-
 }
+
+const printCurrentPosition = async () => {
+  const coordinates = await Geolocation.getCurrentPosition()
+  return coordinates.coords
+};
+
+printCurrentPosition().then((s) => {
+  newRetroGamePost.value.location = {
+    type: "Point",
+    coordinates: [
+      s.latitude,
+      s.longitude
+    ]
+  }
+
+});
+
 
 const openCamera = async () => {
   const pic = await Camera.getPhoto({
@@ -53,7 +89,7 @@ const openCamera = async () => {
   })
 
   if (pic.webPath) {
-    //newCampSpot.value.image = pic.webPath
+    newRetroGamePostImages.value.push(pic.webPath)
   }
 }
 </script>
@@ -71,21 +107,30 @@ const openCamera = async () => {
 
     <ion-content :fullscreen="true">
       <ion-list>
-        <ion-button v-if="'!newCampSpot.image'" @click="openCamera" color="light" class="imageBtn">Velg fil 🖼 eller ta et bilde 📸</ion-button>
+        <ion-button v-if="newRetroGamePostImages.length === 0" @click="openCamera" color="light" class="imageBtn">Velg
+          fil 🖼 eller ta
+          et bilde 📸
+        </ion-button>
 
-        <img v-if="'newCampSpot.image'" @click="openCamera" :src="'newCampSpot.image'"/>
+        <ion-grid v-if="newRetroGamePostImages.length">
+          <ion-row>
+            <retro-game-new-post-images @click="openCamera" v-for="image in newRetroGamePostImages" :key="image"
+                                        :image-src="image"/>
+          </ion-row>
+        </ion-grid>
+
 
         <ion-item>
           <ion-label position="floating">Tittel</ion-label>
-          <ion-input type="text" v-model="kk"></ion-input>
+          <ion-input type="text" v-model="newRetroGamePost.title"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="floating">Description</ion-label>
-          <ion-textarea v-model="ll"></ion-textarea>
+          <ion-textarea v-model="newRetroGamePost.description"></ion-textarea>
         </ion-item>
 
-        <ion-button  @click="postNewCampSpot">Legg til spot 🏕</ion-button>
+        <ion-button @click="postNewRetroGame">Legg til artikkel</ion-button>
       </ion-list>
     </ion-content>
   </ion-page>

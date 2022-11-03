@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue'
 import NewPostPage from '../views/NewPostPage.vue'
 import RegisterOrLoginPage from '../views/RegisterOrLoginPage.vue'
+import PostsMapPage from '../views/PostsMapPage.vue'
 import {toastController} from "@ionic/vue";
 import {authService} from "@/services/directus.service";
 
@@ -51,6 +52,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/auth',
     name: 'RegisterOrLogin',
     component: RegisterOrLoginPage,
+  },
+  {
+    path: '/postsMap',
+    name: 'PostsMapPage',
+    component: PostsMapPage,
   },
 ]
 

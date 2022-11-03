@@ -50,7 +50,6 @@ onIonViewDidEnter(async () => {
   await loadPost()
 })
 
-//------------------------------------------------------------------------
 const printCurrentPosition = async () => {
   const coordinates = await Geolocation.getCurrentPosition();
 
@@ -63,9 +62,6 @@ printCurrentPosition().then((s) => {
   latitude = s.latitude
   longitude = s.longitude
 });
-
-console.log(latitude)
-//------------------------------------------------------------------------
 
 const addNewComment = async () => {
   if (newCommentText.value) {

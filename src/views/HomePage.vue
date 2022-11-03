@@ -26,7 +26,6 @@ import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 import {authService, directus} from "@/services/directus.service";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts"
 import router from "@/router";
-import { GoogleMap } from '@capacitor/google-maps';
 
 const userAccessToken = localStorage.getItem('auth_token');
 
@@ -34,7 +33,6 @@ const retroGamePosts = ref<IRetroGamePosts>([]);
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
-  await createMap()
 })
 
 const loggOff = () => {
@@ -61,38 +59,14 @@ const fetchRetroGamePosts = async () => {
   if (response.status === 200 && response.data) {
     retroGamePosts.value = [...response.data.retroGames_posts];
   }
+  console.log(retroGamePosts.value)
 }
+
 const doRefresh = (event: CustomEvent) => {
   fetchRetroGamePosts();
   event.target.complete();
 }
 
-const createMap = async () => {
-  const mapRef = document.getElementById('map');
-
-  const newMap = await GoogleMap.create({
-    id: 'my-map', // Unique identifier for this map instance
-    element: mapRef, // reference to the capacitor-google-map element
-    apiKey: 'AIzaSyBho7xvaEqMLq5Vj5ZNfoWmEiAYfhIDMe0', // Your Google Maps API Key
-    config: {
-      center: {
-        // The initial position to be rendered by the map
-        lat: 59.911491,
-        lng: 10.757933,
-      },
-      zoom: 12, // The initial zoom level to be rendered by the map
-    },
-  });
-
-  retroGamePosts.value.map(async (post) => {
-    const markerId = await newMap.addMarker({
-      coordinate: {
-        lat: post.location.coordinates[1],
-        lng: post.location.coordinates[0]
-      }
-    });
-  });
-};
 </script>
 
 <template>
@@ -107,7 +81,7 @@ const createMap = async () => {
             ditt eget annonse, så må du registrere deg og logge inn. </p>
         </ion-card-content>
       </ion-card>
-      <capacitor-google-map id="map"></capacitor-google-map>
+
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-refresher slot="fixed" pull-factor="0.5" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)">
@@ -148,15 +122,6 @@ const createMap = async () => {
 
 
 <style scoped>
-
-capacitor-google-map {
-  display: block;
-  margin: auto;
-  width: auto;
-  height: 400px;
-  border: 5px solid;
-  border-radius: 5px;
-}
 
 p {
   font-weight: bold;
