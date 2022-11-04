@@ -22,6 +22,7 @@ import IUserDetails from "@/Interface/IUserDetails"
 let registerMode = ref(false);
 const router = useRouter();
 
+//Trenger kanskje ikke interface????????????
 const userDetails = ref<IUserDetails>({
   firstName: '',
   email: '',

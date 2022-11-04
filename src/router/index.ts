@@ -4,6 +4,8 @@ import HomePage from '../views/HomePage.vue'
 import NewPostPage from '../views/NewPostPage.vue'
 import RegisterOrLoginPage from '../views/RegisterOrLoginPage.vue'
 import PostsMapPage from '../views/PostsMapPage.vue'
+import PostDetailPage from '../views/PostDetailPage.vue'
+import UserPage from '../views/UserPage.vue'
 import {toastController} from "@ionic/vue";
 import {authService} from "@/services/directus.service";
 
@@ -57,6 +59,17 @@ const routes: Array<RouteRecordRaw> = [
     path: '/postsMap',
     name: 'PostsMapPage',
     component: PostsMapPage,
+  },
+  {
+    path: '/postDetail/:id',
+    name: 'PostDetailPage',
+    component: PostDetailPage,
+  },
+  {
+    path: '/userPage',
+    name: 'UserPage',
+    component: UserPage,
+    beforeEnter: [authenticationRequiredRouteGuard]
   },
 ]
 

@@ -1,22 +1,19 @@
 interface IRetroGamePost {
-    camping_spots_by_id: {
+    retroGames_posts_by_id: {
+        id: number,
         title: string,
         description: string,
-        hashtags: string[],
-        image: {
-            id: number
-        },
-        comment_fk: {
-            id: number,
-            first_name: string,
-            comment: string,
-            date_created: string,
-            user_created: {
-                first_name: string,
-                avatar: {
-                    id : number
-                }
-            },
+        images: {
+            directus_files_id: {
+                id: number
+            }
+        }
+        location: {
+            type: string,
+            coordinates: [
+                lat: number,
+                long: number
+            ]
         }
     }
 }

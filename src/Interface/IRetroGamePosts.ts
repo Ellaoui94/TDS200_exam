@@ -1,5 +1,6 @@
 interface IRetroGamePosts {
     retroGames_posts: [{
+        id: number,
         title: string,
         description: string,
         images: {

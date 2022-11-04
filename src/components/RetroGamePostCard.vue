@@ -5,6 +5,7 @@ import {defineProps} from "vue";
 
 interface Props {
   post: {
+    id: number,
     title: string,
     description: string,
     images: {
@@ -26,9 +27,9 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <ion-card>
+  <ion-card :router-link="'postDetail/' + post.id">
     <ion-slides>
-    <retro-game-post-image v-for="image in post.images" :key="image.id" :image-id="image.directus_files_id.id"/>
+    <retro-game-post-image v-for="image in post.images" :key="image.directus_files_id.id" :image-id="image.directus_files_id.id"/>
     </ion-slides>
       <ion-card-header>
       <ion-card-subtitle>{{post.location.coordinates}}</ion-card-subtitle>

@@ -15,6 +15,7 @@ import {
   IonButton,
   IonIcon,
   IonChip,
+    IonSlides,
   IonAvatar, IonText, IonItem, IonListHeader, IonLabel, IonList, IonSpinner, IonTextarea,
   IonModal, onIonViewDidEnter
 } from "@ionic/vue";
@@ -22,9 +23,9 @@ import {
 import {chatboxOutline} from 'ionicons/icons';
 import {ref} from "vue";
 import {Geolocation} from '@capacitor/geolocation';
-import {Loader} from "@googlemaps/js-api-loader";
 import {directus} from "@/services/directus.service";
 import CampingSpotImage from "@/components/CampingSpotImage.vue"
+import RetroGamePostImage from "@/components/RetroGamePostImage.vue";
 
 const route = useRoute();
 const {id} = route.params;
@@ -32,36 +33,38 @@ const {id} = route.params;
 const isModalOpen = ref(false);
 const newCommentText = ref('')
 
-const retroGamePost = ref({})
+const retroGamePost = ref({});
 const comments = ref([])
 
 
 const loadPost = async () => {
-  const response = await directus.graphql.items<IRetroGamePost>(``)
+  const response = await directus.graphql.items<IRetroGamePost>(`
+query MyQuery {
+  retroGames_posts_by_id(id: ${id}) {
+    title
+    description
+    images {
+      id
+      directus_files_id {
+        id
+      }
+    }
+    location
+  }
+}
+`);
   const responseData = response.data
 
   if (response.status === 200 && responseData) {
-    retroGamePost.value = responseData.;
-    comments.value = responseData.
+    retroGamePost.value = responseData.retroGames_posts_by_id;
+    //comments.value = responseData.
   }
 }
+
 
 onIonViewDidEnter(async () => {
   await loadPost()
 })
-
-const printCurrentPosition = async () => {
-  const coordinates = await Geolocation.getCurrentPosition();
-
-  return coordinates.coords
-};
-
-let latitude = null;
-let longitude;
-printCurrentPosition().then((s) => {
-  latitude = s.latitude
-  longitude = s.longitude
-});
 
 const addNewComment = async () => {
   if (newCommentText.value) {
@@ -83,7 +86,7 @@ const addNewComment = async () => {
 
 <template>
   <ion-page>
-    <ion-header v-if="!campingSpot.image" :translucent="true">
+    <ion-header v-if="!retroGamePost.images" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button deafult-href="/"></ion-back-button>
@@ -97,7 +100,7 @@ const addNewComment = async () => {
         <ion-buttons slot="start">
           <ion-back-button deafult-href="/"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ campingSpot.title }} ({{ id }})</ion-title>
+        <ion-title>{{ retroGamePost.title }}</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="isModalOpen = true">
             <ion-icon :icon="chatboxOutline"></ion-icon>
@@ -106,17 +109,18 @@ const addNewComment = async () => {
       </ion-toolbar>
     </ion-header>
 
-    <ion-content v-if="campingSpot.image" :fullscreen="true">
-      <camping-spot-image :image-id="campingSpot.image.id"/>
-      <ion-chip v-for="hashtag in campingSpot.hashtags" :key="hashtag" color="tertiary">#{{ hashtag }}</ion-chip>
+    <ion-content v-if="retroGamePost.images" :fullscreen="true">
+      <ion-slides>
+        <retro-game-post-image  v-for="image in retroGamePost.images" :key="image.directus_files_id.id" :image-id="image.directus_files_id.id"/>
+      </ion-slides>
 
       <ion-card>
-        <ion-card-title>{{ campingSpot.title }}</ion-card-title>
+        <ion-card-title>{{ retroGamePost.title }}</ion-card-title>
         <ion-card-content>
-          {{ campingSpot.description }}
+          {{ retroGamePost.description }}
         </ion-card-content>
       </ion-card>
-
+<!--
       <ion-card>
         <ion-list>
           <ion-list-header>
@@ -141,7 +145,7 @@ const addNewComment = async () => {
           </ion-item>
         </ion-list>
       </ion-card>
-
+-->
       <ion-modal
           :is-open="isModalOpen"
           :initial-breakpoint="0.25"
@@ -157,4 +161,5 @@ const addNewComment = async () => {
       </ion-modal>
     </ion-content>
   </ion-page>
+
 </template>

@@ -13,7 +13,10 @@ import {
   IonFabButton,
   IonFabList,
   IonIcon,
-  IonLabel, onIonViewDidEnter
+  IonLabel,
+    IonButtons,
+    IonButton,
+  onIonViewDidEnter
 } from '@ionic/vue';
 import {
   addCircleOutline,
@@ -21,6 +24,7 @@ import {
   settings,
   logIn, logOut,
 } from "ionicons/icons";
+import {personCircleOutline, mapOutline} from "ionicons/icons";
 import {ref} from 'vue';
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 import {authService, directus} from "@/services/directus.service";
@@ -44,6 +48,7 @@ const fetchRetroGamePosts = async () => {
   const response = await directus.graphql.items<IRetroGamePosts>(`
   query MyQuery {
   retroGames_posts {
+    id
     title
     description
     images {
@@ -74,6 +79,14 @@ const doRefresh = (event: CustomEvent) => {
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>NostalgiGames 🕹</ion-title>
+        <ion-buttons slot="primary">
+          <ion-button router-link="/userPage">
+            <ion-icon slot="icon-only" :icon="personCircleOutline"/>
+          </ion-button>
+          <ion-button router-link="/postsMap">
+            <ion-icon slot="icon-only" :icon="mapOutline"/>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
       <ion-card>
         <ion-card-content>

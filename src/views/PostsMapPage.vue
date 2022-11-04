@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {IonPage, IonContent} from "@ionic/vue";
+import {IonPage, IonContent, IonHeader, IonToolbar, IonButtons, IonSpinner, IonBackButton} from "@ionic/vue";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts";
 import {directus} from "@/services/directus.service";
 import {GoogleMap} from "@capacitor/google-maps";
@@ -42,15 +42,15 @@ const createMap = async () => {
         lat: 59.911491,
         lng: 10.757933,
       },
-      zoom: 12, // The initial zoom level to be rendered by the map
+      zoom: 10, // The initial zoom level to be rendered by the map
     },
   });
 
   retroGamePosts.value.map(async (post) => {
     const markerId = await newMap.addMarker({
       coordinate: {
-        lat: post.location.coordinates[1],
-        lng: post.location.coordinates[0]
+        lat: post.location.coordinates[0],
+        lng: post.location.coordinates[1]
       }
     });
   });
@@ -64,6 +64,14 @@ onIonViewDidEnter(async () => {
 
 <template>
   <ion-page>
+    <ion-header :translucent="true">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button deafult-href="/"></ion-back-button>
+        </ion-buttons>
+        <ion-spinner v-if="!createMap" style="margin-left: 30px" name="circular"></ion-spinner>
+      </ion-toolbar>
+    </ion-header>
     <ion-content :fullscreen="true">
       <p>tetestg</p>
       <capacitor-google-map id="map"></capacitor-google-map>
