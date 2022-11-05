@@ -14,12 +14,15 @@ import {
   IonLabel,
   IonList,
   IonPage,
-  toastController
+  toastController, onIonViewDidLeave, onIonViewWillEnter
 } from '@ionic/vue';
 import {Camera, CameraResultType} from "@capacitor/camera";
 import IUserDetails from "@/Interface/IUserDetails";
 import defaultUserImage from "@/components/defaultUserImage";
 
+onIonViewDidLeave(()=> {
+  location.reload();
+})
 
 let registerMode = ref(false);
 let segmentDefMode = ref('login');
@@ -38,7 +41,7 @@ const userDetails = ref<IUserDetails>({
 
 const login = async () => {
   try {
-    await authService.login(userDetails.value.email, userDetails.value.password)
+    await authService.login(userDetails.value.email, userDetails.value.password);
     await router.replace('/home');
   } catch (error) {
     await (await toastController.create({
@@ -134,21 +137,22 @@ const openCamera = async () => {
 
         <ion-item>
           <ion-label class="label-mild" position="floating">Passord</ion-label>
-          <ion-input v-on:keyup.enter="login" type="password" v-model="userDetails.password"/>
+          <ion-input v-if="!registerMode" v-on:keyup.enter="login" type="password" v-model="userDetails.password"/>
+          <ion-input v-if="registerMode" v-on:keyup.enter="register" type="password" v-model="userDetails.password"/>
         </ion-item>
 
         <div style="display: inline-block">
-          <ion-button router-link="/home" class="button-auth" fill="solid" color="dark" size="default">
+          <ion-button router-link="/" class="button-auth" fill="solid" color="dark" size="default">
             Tilbake til hjemmesiden
           </ion-button>
 
           <ion-button v-if="registerMode" @click="register" class="button-auth" fill="solid" color="dark"
                       size="default">
-            Registrer deg 🏕
+            Registrer deg 🕹
           </ion-button>
 
           <ion-button v-else @click="login" class="button-auth" fill="solid" color="dark" size="default">
-            Logg inn 🏕
+            Logg inn 🕹
           </ion-button>
         </div>
       </ion-list>
@@ -164,11 +168,6 @@ const openCamera = async () => {
   border: 2px #8a8a8a dashed;
   border-radius: 8px;
   font-size: small;
-}
-
-ion-content {
-  --ion-background-color: #f4f4f4;
-  display: flex;
 }
 
 ion-list {
@@ -194,6 +193,5 @@ ion-list {
   margin-top: 50px;
   margin-left: 10px;
   margin-right: 10px;
-  font-family: "Retro Gaming";
 }
 </style>

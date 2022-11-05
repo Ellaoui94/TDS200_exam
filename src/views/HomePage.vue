@@ -14,10 +14,10 @@ import {
   IonFabList,
   IonIcon,
   IonLabel,
-    IonButtons,
-    IonButton,
-    IonProgressBar,
-  onIonViewDidEnter
+  IonButtons,
+  IonButton,
+  IonProgressBar,
+  onIonViewDidEnter, onIonViewWillEnter, onIonViewDidLeave
 } from '@ionic/vue';
 import {
   addCircleOutline,
@@ -50,13 +50,16 @@ const fetchRetroGamePosts = async () => {
   query MyQuery {
   retroGames_posts {
     id
-    title
-    description
     images {
       directus_files_id {
         id
       }
     }
+    title
+    description
+    plattform
+    state
+    price
     location
   }
 }

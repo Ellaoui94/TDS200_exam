@@ -20,7 +20,6 @@ export const authService = {
             role: "33686bc6-3b6b-438c-ad00-f3f51b018fbe"
         });
 
-        //createUSerResult && createUserResult.email | les kunn hvis createUserResult har en verdi
         return !!createUserResult?.email
     },
     async logout(){
@@ -28,7 +27,7 @@ export const authService = {
     },
     async currentUser(){
         return await directus.users.me.read({
-            fields: ['email', 'first_name', 'avatar']
+            fields: ['id', 'email', 'first_name', 'avatar']
         });
     }
 }

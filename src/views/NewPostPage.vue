@@ -14,53 +14,81 @@ import {
   IonRow,
   IonTextarea,
   IonTitle,
-  IonToolbar
+  IonToolbar, toastController,
+    IonChip,
+    IonSelect,
+    IonSelectOption
 } from "@ionic/vue";
 import {Camera, CameraResultType} from "@capacitor/camera";
 import {directus} from "@/services/directus.service";
 import {ref} from "vue";
 import RetroGameNewPostImages from "@/components/RetroGameNewPostImages.vue";
 import {Geolocation} from '@capacitor/geolocation';
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 const newRetroGamePost = ref({
+  images: {},
   title: '',
   description: '',
-  images: {},
+  plattform: [],
+  price: 0,
+  state: "",
   location: {
     type: '',
     coordinates: []
   },
 })
 
+newRetroGamePost.value.price = '' as unknown as number;
+
 const newRetroGamePostImages = ref([]);
+const newPlatForm = ref('');
+const status = ref(["Brukt", "Ubrukt", "Solgt"]);
+
+const addNewPlatform = () => {
+  if (newPlatForm.value){
+    newRetroGamePost.value.plattform.push(newPlatForm.value)
+    newPlatForm.value = "";
+  }
+}
 
 const postNewRetroGame = async () => {
-  /*if (!campingSpot.image) {
-    alert("BILDE REQUIRED")
+  if (newRetroGamePostImages.value.length === 0) {
+    alert("Må ha med bilde(r) av produktet")
     return;
-  }*/
- const test = newRetroGamePostImages.value.map(async (image) => {
+  }
+  const imagesResult = newRetroGamePostImages.value.map(async (image) => {
     const res = await fetch(image)
     const imgBlob = await res.blob();
     const formData = new FormData();
     formData.append('file', imgBlob);
     const fileUpload = await directus.files.createOne(formData)
-   return {
+    return {
       directus_files_id: {
         id: fileUpload.id
       }
     }
   })
-  newRetroGamePost.value.images = [...await Promise.all(test)];
+  newRetroGamePost.value.images = [...await Promise.all(imagesResult)];
   try {
     await directus.items('retroGames_posts').createOne({
+      images: newRetroGamePost.value.images,
       title: newRetroGamePost.value.title,
       description: newRetroGamePost.value.description,
-      images: newRetroGamePost.value.images,
+      plattform: newRetroGamePost.value.plattform,
+      price: newRetroGamePost.value.price,
+      state: newRetroGamePost.value.state,
       location: newRetroGamePost.value.location
     })
+    await router.replace('/home');
+
   } catch (e) {
-    console.error(e)
+    await (await toastController.create({
+      message: `${e}`,
+      duration: 3000,
+      color: "warning"
+    })).present();
   }
 }
 
@@ -99,7 +127,7 @@ const openCamera = async () => {
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button deafult-href="/"></ion-back-button>
+          <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-title>Nostalgia Shop 🕹</ion-title>
       </ion-toolbar>
@@ -114,10 +142,11 @@ const openCamera = async () => {
 
         <ion-grid v-if="newRetroGamePostImages.length">
           <ion-row>
-            <retro-game-new-post-images @click="openCamera" v-for="image in newRetroGamePostImages" :key="image"
+            <retro-game-new-post-images v-for="image in newRetroGamePostImages" :key="image"
                                         :image-src="image"/>
           </ion-row>
         </ion-grid>
+        <ion-button v-if="newRetroGamePostImages.length" @click="openCamera">Legg til bilder(r) 📷</ion-button>
 
 
         <ion-item>
@@ -130,19 +159,40 @@ const openCamera = async () => {
           <ion-textarea v-model="newRetroGamePost.description"></ion-textarea>
         </ion-item>
 
+        <ion-item>
+          <ion-label position="floating">Plattform:</ion-label>
+          <ion-input v-on:keyup.enter="addNewPlatform" v-model="newPlatForm"></ion-input>
+
+          <ion-button slot="end" size="default" @click="addNewPlatform">Legg til plattform</ion-button>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-chip color="primary" v-for="platform in newRetroGamePost.plattform" :key="platform">{{platform}}</ion-chip>
+        </ion-item>
+
+        <ion-item>
+        <ion-select interface="action-sheet" placeholder="Velg tilstand" @ionChange="newRetroGamePost.state = $event.detail.value">
+          <ion-select-option v-for="state in status" :key="state" :value="state">{{ state }}</ion-select-option>
+        </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Pris: </ion-label>
+          <ion-input type="number" v-on:keyup.enter="postNewRetroGame" v-model="newRetroGamePost.price"></ion-input>
+        </ion-item>
         <ion-button @click="postNewRetroGame">Legg til artikkel</ion-button>
       </ion-list>
     </ion-content>
   </ion-page>
 </template>
 
-<style>
+<style scoped>
 .imageBtn {
   margin: 10px;
   height: 20vh;
   border: 2px #8a8a8a dashed;
   border-radius: 8px;
-  font-size: medium;
+  font-size: small;
 }
 
 ion-content {

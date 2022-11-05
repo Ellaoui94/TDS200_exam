@@ -25,7 +25,7 @@ import {
   IonModal, onIonViewDidEnter, toastController
 } from "@ionic/vue";
 
-import {chatboxOutline} from 'ionicons/icons';
+import {chatboxOutline, sendSharp} from 'ionicons/icons';
 import {ref} from "vue";
 import {Geolocation} from '@capacitor/geolocation';
 import {directus} from "@/services/directus.service";
@@ -98,11 +98,20 @@ onIonViewDidEnter(async () => {
 const addNewComment = async () => {
   if (newCommentText.value) {
     try {
-      await directus.items('retroGames_post_comments').createOne({
+      const res = await directus.items('retroGames_post_comments').createOne({
         comment: newCommentText.value,
         retroGame_spot_fk: id,
       })
     } catch (e) {
+      if (e.message == "You don't have permission to access this.") {
+        await (await toastController.create({
+          message: `Du må være innlogget `,
+          duration: 3000,
+          color: "warning"
+        })).present();
+        isModalOpen.value = false;
+        return;
+      }
       await (await toastController.create({
         message: `${e}`,
         duration: 3000,
@@ -122,7 +131,7 @@ const addNewComment = async () => {
     <ion-header v-if="!retroGamePost.images" :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button deafult-href="/"></ion-back-button>
+          <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-spinner style="margin-left: 30px" name="circular"></ion-spinner>
       </ion-toolbar>
@@ -131,19 +140,14 @@ const addNewComment = async () => {
     <ion-header v-else :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button deafult-href="/"></ion-back-button>
+          <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ retroGamePost.title }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="isModalOpen = true">
-            <ion-icon :icon="chatboxOutline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content v-if="retroGamePost.images" :fullscreen="true">
-      <ion-slides>
+      <ion-slides class="hero-image">
         <retro-game-post-image v-for="image in retroGamePost.images" :key="image.directus_files_id.id"
                                :image-id="image.directus_files_id.id"/>
       </ion-slides>
@@ -160,35 +164,37 @@ const addNewComment = async () => {
         </ion-card-header>
         <ion-card-content>
           {{ retroGamePost.description }}
-          <ion-label>{{address}}</ion-label>
+          <ion-label>{{ address }}</ion-label>
           <ion-card-title>Kr{{ retroGamePost.price }}</ion-card-title>
         </ion-card-content>
       </ion-card>
-            <ion-card>
-              <ion-list>
-                <ion-list-header>
-                  <ion-label>
-                    Hva synes du om produktet/selgeren? Legg igjen en kommentar 😃
-                    <ion-icon :icon="chatboxOutline"></ion-icon>
-                  </ion-label>
-                </ion-list-header>
-                <ion-item v-for="comment in comments" :key="comment.id" lines="none">
-                  <ion-avatar slot="start">
-<!--                    <camping-spot-image v-if="!comment.user_created.avatar" :image-id="campingSpot.image.id"/>
-                    <camping-spot-image v-else :image-id="comment.user_created.avatar.id"/>-->
-                  </ion-avatar>
-                  <ion-label class="ion-text-wrap">
-                    <ion-header>
-                      <b>{{ comment.user_created.first_name }}</b>
-                    </ion-header>
-                    <ion-text>
-                      <b>{{ comment.comment }}</b>
-                    </ion-text>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-card>
-      -->
+      <ion-card>
+        <ion-list>
+          <ion-list-header>
+            <ion-label>
+              Hva synes du om produktet/selgeren?
+              <ion-buttons slot="end">
+                <ion-button @click="isModalOpen = true">
+                  <ion-icon :icon="chatboxOutline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-label>
+          </ion-list-header>
+          <ion-item v-for="comment in comments" :key="comment.id" lines="none">
+            <ion-avatar slot="start">
+              <img :src="`https://7qp4jl4l.directus.app/assets/${comment.user_created.avatar.id}`"/>
+            </ion-avatar>
+            <ion-label class="ion-text-wrap">
+              <ion-header>
+                <b>{{ comment.user_created.first_name }}</b>
+              </ion-header>
+              <ion-text>
+                <ion-card-subtitle>{{ comment.comment }}</ion-card-subtitle>
+              </ion-text>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card>
       <ion-modal
           :is-open="isModalOpen"
           :initial-breakpoint="0.25"
@@ -198,7 +204,9 @@ const addNewComment = async () => {
           <ion-item lines="none">
             <ion-label position="floating">Ny hate eller love?</ion-label>
             <ion-textarea v-model="newCommentText"></ion-textarea>
-            <ion-button @click="addNewComment"></ion-button>
+            <ion-button class="modalBtn" @click="addNewComment">
+              <ion-icon :icon="sendSharp"/>
+            </ion-button>
           </ion-item>
         </ion-content>
       </ion-modal>
@@ -208,8 +216,17 @@ const addNewComment = async () => {
 </template>
 
 <style scoped>
-ion-chip {
-  color: #52ffe4;
+
+.hero-image {
+  background: linear-gradient(#242424, #242424) padding-box,
+  linear-gradient(to right, red, orange) border-box;
+  border-radius: 10%;
+  border: 15px solid transparent;
+
+}
+
+.modalBtn {
+  --background: linear-gradient(43deg, #ff0000 0%, #ffa500 46%, #ff0000 100%);
 }
 
 </style>

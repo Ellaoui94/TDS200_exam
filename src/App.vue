@@ -25,4 +25,11 @@ export default defineComponent({
 ion-spinner{
   --color: #52ffe4;
 }
+
+ion-button{
+  --background: linear-gradient(43deg, #ff0000 0%, #ffa500 46%, #ff0000 100%);
+}
+ion-chip {
+  color: #52ffe4;
+}
 </style>

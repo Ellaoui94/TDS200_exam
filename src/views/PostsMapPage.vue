@@ -67,7 +67,7 @@ onIonViewDidEnter(async () => {
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button deafult-href="/"></ion-back-button>
+          <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-spinner v-if="!createMap" style="margin-left: 30px" name="circular"></ion-spinner>
       </ion-toolbar>
