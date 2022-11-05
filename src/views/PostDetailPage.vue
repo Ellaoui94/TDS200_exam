@@ -147,6 +147,7 @@ const addNewComment = async () => {
     </ion-header>
 
     <ion-content v-if="retroGamePost.images" :fullscreen="true">
+
       <ion-slides class="hero-image">
         <retro-game-post-image v-for="image in retroGamePost.images" :key="image.directus_files_id.id"
                                :image-id="image.directus_files_id.id"/>
@@ -154,31 +155,43 @@ const addNewComment = async () => {
 
       <ion-card>
         <ion-card-header>
-          <div>
-            <ion-card-subtitle>Plattform:</ion-card-subtitle>
-            <ion-chip v-for="plattform in retroGamePost.plattform" :key="plattform">{{ plattform }}</ion-chip>
-          </div>
+
+          <ion-row>
+            <ion-col size="9">
+              <ion-chip v-for="plattform in retroGamePost.plattform" :key="plattform">{{ plattform }}</ion-chip>
+            </ion-col>
+            <ion-col size="3">
+              <ion-chip style="color: orange">{{ retroGamePost.state }}</ion-chip>
+            </ion-col>
+          </ion-row>
+
           <ion-card-title>{{ retroGamePost.title }}</ion-card-title>
-          <ion-card-subtitle>Tilstand:</ion-card-subtitle>
-          <ion-chip>{{ retroGamePost.state }}</ion-chip>
         </ion-card-header>
         <ion-card-content>
           {{ retroGamePost.description }}
-          <ion-label>{{ address }}</ion-label>
-          <ion-card-title>Kr{{ retroGamePost.price }}</ion-card-title>
+          <ion-row>
+            <ion-col size="3">
+              <ion-card-title>Kr{{ retroGamePost.price }}</ion-card-title>
+            </ion-col>
+            <ion-col size="9">
+              <ion-label>{{ address }}</ion-label>
+            </ion-col>
+          </ion-row>
         </ion-card-content>
       </ion-card>
       <ion-card>
         <ion-list>
           <ion-list-header>
-            <ion-label>
-              Hva synes du om produktet/selgeren?
+            <ion-item>
+              <ion-card-title>
+                Hva synes du om produktet/selgeren?
+              </ion-card-title>
               <ion-buttons slot="end">
                 <ion-button @click="isModalOpen = true">
-                  <ion-icon :icon="chatboxOutline"></ion-icon>
+                  <ion-icon size="large" :icon="chatboxOutline"></ion-icon>
                 </ion-button>
               </ion-buttons>
-            </ion-label>
+            </ion-item>
           </ion-list-header>
           <ion-item v-for="comment in comments" :key="comment.id" lines="none">
             <ion-avatar slot="start">
@@ -222,7 +235,6 @@ const addNewComment = async () => {
   linear-gradient(to right, red, orange) border-box;
   border-radius: 10%;
   border: 15px solid transparent;
-
 }
 
 .modalBtn {

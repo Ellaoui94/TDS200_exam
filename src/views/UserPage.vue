@@ -93,13 +93,15 @@ const presentActionSheet = async () => {
           <ion-card-subtitle>{{ currentUser.email }}</ion-card-subtitle>
         </ion-card-content>
       </ion-card>
-      <ion-button @click="updateCurrentUser" fill="solid" color="dark" size="default">
-        Endre bruker
-      </ion-button>
+      <ion-buttons class="profilePageBtns">
+        <ion-button @click="updateCurrentUser" fill="solid" color="dark" size="default">
+          Endre bruker
+        </ion-button>
 
-      <ion-button @click="presentActionSheet" fill="solid" color="dark" size="default">
-        Slett bruker 😢
-      </ion-button>
+        <ion-button @click="presentActionSheet" fill="solid" color="dark" size="default">
+          Slett bruker 😢
+        </ion-button>
+      </ion-buttons>
     </ion-content>
   </ion-page>
 
@@ -109,5 +111,11 @@ const presentActionSheet = async () => {
 ion-avatar {
   width: 100%;
   height: 50%;
+}
+
+.profilePageBtns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 </style>

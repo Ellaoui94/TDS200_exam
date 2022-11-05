@@ -14,13 +14,14 @@ import {
   IonLabel,
   IonList,
   IonPage,
-  toastController, onIonViewDidLeave, onIonViewWillEnter
+  IonButtons,
+  toastController, onIonViewDidLeave
 } from '@ionic/vue';
 import {Camera, CameraResultType} from "@capacitor/camera";
 import IUserDetails from "@/Interface/IUserDetails";
 import defaultUserImage from "@/components/defaultUserImage";
 
-onIonViewDidLeave(()=> {
+onIonViewDidLeave(() => {
   location.reload();
 })
 
@@ -141,9 +142,9 @@ const openCamera = async () => {
           <ion-input v-if="registerMode" v-on:keyup.enter="register" type="password" v-model="userDetails.password"/>
         </ion-item>
 
-        <div style="display: inline-block">
+        <ion-buttons class="loginRegisterBtns">
           <ion-button router-link="/" class="button-auth" fill="solid" color="dark" size="default">
-            Tilbake til hjemmesiden
+            Tilbake
           </ion-button>
 
           <ion-button v-if="registerMode" @click="register" class="button-auth" fill="solid" color="dark"
@@ -154,7 +155,7 @@ const openCamera = async () => {
           <ion-button v-else @click="login" class="button-auth" fill="solid" color="dark" size="default">
             Logg inn 🕹
           </ion-button>
-        </div>
+        </ion-buttons>
       </ion-list>
 
     </ion-content>
@@ -193,5 +194,11 @@ ion-list {
   margin-top: 50px;
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.loginRegisterBtns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 </style>

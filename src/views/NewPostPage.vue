@@ -15,9 +15,10 @@ import {
   IonTextarea,
   IonTitle,
   IonToolbar, toastController,
-    IonChip,
-    IonSelect,
-    IonSelectOption
+  IonChip,
+  IonSelect,
+  IonSelectOption,
+  IonCol
 } from "@ionic/vue";
 import {Camera, CameraResultType} from "@capacitor/camera";
 import {directus} from "@/services/directus.service";
@@ -47,7 +48,7 @@ const newPlatForm = ref('');
 const status = ref(["Brukt", "Ubrukt", "Solgt"]);
 
 const addNewPlatform = () => {
-  if (newPlatForm.value){
+  if (newPlatForm.value) {
     newRetroGamePost.value.plattform.push(newPlatForm.value)
     newPlatForm.value = "";
   }
@@ -163,23 +164,30 @@ const openCamera = async () => {
           <ion-label position="floating">Plattform:</ion-label>
           <ion-input v-on:keyup.enter="addNewPlatform" v-model="newPlatForm"></ion-input>
 
-          <ion-button slot="end" size="default" @click="addNewPlatform">Legg til plattform</ion-button>
+          <ion-button slot="end" style="width: 20vh" size="default" @click="addNewPlatform">Legg til</ion-button>
         </ion-item>
 
         <ion-item lines="none">
-          <ion-chip color="primary" v-for="platform in newRetroGamePost.plattform" :key="platform">{{platform}}</ion-chip>
+          <ion-chip color="primary" v-for="platform in newRetroGamePost.plattform" :key="platform">{{ platform }}
+          </ion-chip>
         </ion-item>
 
-        <ion-item>
-        <ion-select interface="action-sheet" placeholder="Velg tilstand" @ionChange="newRetroGamePost.state = $event.detail.value">
-          <ion-select-option v-for="state in status" :key="state" :value="state">{{ state }}</ion-select-option>
-        </ion-select>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="floating">Pris: </ion-label>
-          <ion-input type="number" v-on:keyup.enter="postNewRetroGame" v-model="newRetroGamePost.price"></ion-input>
-        </ion-item>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-select interface="action-sheet" placeholder="Velg tilstand"
+                          @ionChange="newRetroGamePost.state = $event.detail.value">
+                <ion-select-option v-for="state in status" :key="state" :value="state">{{ state }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label position="floating">Pris:</ion-label>
+              <ion-input type="number" v-on:keyup.enter="postNewRetroGame" v-model="newRetroGamePost.price"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
         <ion-button @click="postNewRetroGame">Legg til artikkel</ion-button>
       </ion-list>
     </ion-content>
@@ -202,5 +210,9 @@ ion-content {
 ion-list {
   display: flex;
   flex-direction: column;
+}
+
+ion-button {
+  color: black;
 }
 </style>
