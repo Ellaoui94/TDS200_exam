@@ -5,6 +5,7 @@ import {
   IonBackButton,
   IonButtons,
   IonCard,
+  IonCardHeader,
   IonCardContent,
   IonCardTitle,
   IonContent,
@@ -15,9 +16,13 @@ import {
   IonButton,
   IonIcon,
   IonChip,
-    IonSlides,
+  IonSlides,
+  IonGrid,
+  IonRow,
+  IonCol,
   IonAvatar, IonText, IonItem, IonListHeader, IonLabel, IonList, IonSpinner, IonTextarea,
-  IonModal, onIonViewDidEnter
+  IonCardSubtitle,
+  IonModal, onIonViewDidEnter, toastController
 } from "@ionic/vue";
 
 import {chatboxOutline} from 'ionicons/icons';
@@ -31,25 +36,40 @@ const route = useRoute();
 const {id} = route.params;
 
 const isModalOpen = ref(false);
-const newCommentText = ref('')
+const newCommentText = ref('');
+const address = ref('');
 
 const retroGamePost = ref({});
-const comments = ref([])
-
+const comments = ref([]);
 
 const loadPost = async () => {
   const response = await directus.graphql.items<IRetroGamePost>(`
 query MyQuery {
   retroGames_posts_by_id(id: ${id}) {
-    title
-    description
+    id
     images {
       id
       directus_files_id {
         id
       }
     }
+    title
+    description
+    plattform
+    price
+    state
     location
+    retroGame_post_comments_fk {
+      id
+      comment
+      user_created {
+        first_name
+        email
+        avatar {
+          id
+        }
+      }
+    }
   }
 }
 `);
@@ -57,24 +77,37 @@ query MyQuery {
 
   if (response.status === 200 && responseData) {
     retroGamePost.value = responseData.retroGames_posts_by_id;
-    //comments.value = responseData.
+    comments.value = responseData.retroGames_posts_by_id.retroGame_post_comments_fk;
   }
 }
 
+const getAddress = async () => {
+  const lat = retroGamePost.value.location.coordinates[0];
+  const lng = retroGamePost.value.location.coordinates[1];
+  const result = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBQaiG2nK8exSsqrTPWclIDXrmbi1XlcJQ`);
+  return result.json();
+}
 
 onIonViewDidEnter(async () => {
   await loadPost()
+  await getAddress();
+  const {results} = await getAddress();
+  address.value = results[0].formatted_address;
 })
 
 const addNewComment = async () => {
   if (newCommentText.value) {
     try {
-      await directus.items('').createOne({
+      await directus.items('retroGames_post_comments').createOne({
         comment: newCommentText.value,
-        campSpot_fk: id,
+        retroGame_spot_fk: id,
       })
     } catch (e) {
-      console.error(e)
+      await (await toastController.create({
+        message: `${e}`,
+        duration: 3000,
+        color: "warning"
+      })).present();
     }
   }
 
@@ -111,41 +144,51 @@ const addNewComment = async () => {
 
     <ion-content v-if="retroGamePost.images" :fullscreen="true">
       <ion-slides>
-        <retro-game-post-image  v-for="image in retroGamePost.images" :key="image.directus_files_id.id" :image-id="image.directus_files_id.id"/>
+        <retro-game-post-image v-for="image in retroGamePost.images" :key="image.directus_files_id.id"
+                               :image-id="image.directus_files_id.id"/>
       </ion-slides>
 
       <ion-card>
-        <ion-card-title>{{ retroGamePost.title }}</ion-card-title>
+        <ion-card-header>
+          <div>
+            <ion-card-subtitle>Plattform:</ion-card-subtitle>
+            <ion-chip v-for="plattform in retroGamePost.plattform" :key="plattform">{{ plattform }}</ion-chip>
+          </div>
+          <ion-card-title>{{ retroGamePost.title }}</ion-card-title>
+          <ion-card-subtitle>Tilstand:</ion-card-subtitle>
+          <ion-chip>{{ retroGamePost.state }}</ion-chip>
+        </ion-card-header>
         <ion-card-content>
           {{ retroGamePost.description }}
+          <ion-label>{{address}}</ion-label>
+          <ion-card-title>Kr{{ retroGamePost.price }}</ion-card-title>
         </ion-card-content>
       </ion-card>
-<!--
-      <ion-card>
-        <ion-list>
-          <ion-list-header>
-            <ion-label>
-              Er du en hater eller en lover? Vis deg frem 😈
-              <ion-icon :icon="chatboxOutline"></ion-icon>
-            </ion-label>
-          </ion-list-header>
-          <ion-item v-for="comment in comments" :key="comment.id" lines="none">
-            <ion-avatar slot="start">
-              <camping-spot-image v-if="!comment.user_created.avatar" :image-id="campingSpot.image.id"/>
-              <camping-spot-image v-else :image-id="comment.user_created.avatar.id"/>
-            </ion-avatar>
-            <ion-label class="ion-text-wrap">
-              <ion-header>
-                <b>{{ comment.user_created.first_name }}</b>
-              </ion-header>
-              <ion-text>
-                <b>{{ comment.comment }}</b>
-              </ion-text>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-card>
--->
+            <ion-card>
+              <ion-list>
+                <ion-list-header>
+                  <ion-label>
+                    Hva synes du om produktet/selgeren? Legg igjen en kommentar 😃
+                    <ion-icon :icon="chatboxOutline"></ion-icon>
+                  </ion-label>
+                </ion-list-header>
+                <ion-item v-for="comment in comments" :key="comment.id" lines="none">
+                  <ion-avatar slot="start">
+<!--                    <camping-spot-image v-if="!comment.user_created.avatar" :image-id="campingSpot.image.id"/>
+                    <camping-spot-image v-else :image-id="comment.user_created.avatar.id"/>-->
+                  </ion-avatar>
+                  <ion-label class="ion-text-wrap">
+                    <ion-header>
+                      <b>{{ comment.user_created.first_name }}</b>
+                    </ion-header>
+                    <ion-text>
+                      <b>{{ comment.comment }}</b>
+                    </ion-text>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card>
+      -->
       <ion-modal
           :is-open="isModalOpen"
           :initial-breakpoint="0.25"
@@ -163,3 +206,10 @@ const addNewComment = async () => {
   </ion-page>
 
 </template>
+
+<style scoped>
+ion-chip {
+  color: #52ffe4;
+}
+
+</style>

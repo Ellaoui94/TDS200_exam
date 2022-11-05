@@ -35,7 +35,7 @@ const createMap = async () => {
   const newMap = await GoogleMap.create({
     id: 'my-map', // Unique identifier for this map instance
     element: mapRef, // reference to the capacitor-google-map element
-    apiKey: 'AIzaSyBho7xvaEqMLq5Vj5ZNfoWmEiAYfhIDMe0', // Your Google Maps API Key
+    apiKey: 'AIzaSyBQaiG2nK8exSsqrTPWclIDXrmbi1XlcJQ', // Your Google Maps API Key
     config: {
       center: {
         // The initial position to be rendered by the map

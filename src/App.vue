@@ -16,3 +16,13 @@ export default defineComponent({
   }
 });
 </script>
+
+<style>
+*{
+  font-family: "Retro Gaming";
+}
+
+ion-spinner{
+  --color: #52ffe4;
+}
+</style>

@@ -17,10 +17,14 @@ import {
   toastController
 } from '@ionic/vue';
 import {Camera, CameraResultType} from "@capacitor/camera";
-import IUserDetails from "@/Interface/IUserDetails"
+import IUserDetails from "@/Interface/IUserDetails";
+import defaultUserImage from "@/components/defaultUserImage";
+
 
 let registerMode = ref(false);
+let segmentDefMode = ref('login');
 const router = useRouter();
+
 
 //Trenger kanskje ikke interface????????????
 const userDetails = ref<IUserDetails>({
@@ -50,11 +54,9 @@ const register = async () => {
   try {
     let res = await fetch(userDetails.value.avatar.id)
 
-    // if statement not working as I want it to
-    if (!res) {
-      const defaultImg = document.createElement('img');
-      defaultImg.src = "public/assets/defaultUser.png";
-      res = await fetch(defaultImg.src)
+    // explain this
+    if (segmentDefMode.value === 'login') {
+      res = await fetch(defaultUserImage);
       const imgBlob = await res.blob();
       const formData = new FormData();
       formData.append('file', imgBlob);
@@ -86,8 +88,8 @@ const openCamera = async () => {
     allowEditing: false,
     resultType: CameraResultType.Uri
   })
-
   if (pic.webPath) {
+    segmentDefMode.value = 'register';
     userDetails.value.avatar.id = pic.webPath
   }
 }
@@ -99,7 +101,7 @@ const openCamera = async () => {
       <ion-list>
         <ion-header>
           <ion-toolbar>
-            <ion-segment value="login">
+            <ion-segment :value="segmentDefMode">
               <ion-segment-button @click="registerMode = false" value="login">
                 <ion-label>Login</ion-label>
               </ion-segment-button>
@@ -110,11 +112,13 @@ const openCamera = async () => {
           </ion-toolbar>
         </ion-header>
 
-        <ion-button v-if="!userDetails.avatar.id" @click="openCamera" color="light" class="imageBtn">Velg fil 🖼 eller ta
-          et bilde 📸
+        <ion-button v-if="!userDetails.avatar.id && registerMode" @click="openCamera" color="light" class="imageBtn">
+          Velg fil 🖼 eller ta et bilde 📸
         </ion-button>
 
-        <img class="hero-image" v-else @click="openCamera" :src="userDetails.avatar.id"/>
+        <img class="hero-image" v-if="!registerMode" src="../../public/assets/defaultUser.png"/>
+        <img class="hero-image" v-if="registerMode && userDetails.avatar.id" :src="userDetails.avatar.id"/>
+        <ion-button v-if="registerMode && userDetails.avatar.id" @click="openCamera">Endre bilde 🔄</ion-button>
 
         <hr/>
 
@@ -159,7 +163,7 @@ const openCamera = async () => {
   height: 20vh;
   border: 2px #8a8a8a dashed;
   border-radius: 8px;
-  font-size: medium;
+  font-size: small;
 }
 
 ion-content {
@@ -177,13 +181,19 @@ ion-list {
 }
 
 .hero-image {
-  width: 80vw;
+  width: 355px;
   align-self: center;
+  background: linear-gradient(white, white) padding-box,
+  linear-gradient(to right, red, orange) border-box;
+  border-radius: 10%;
+  border: 15px solid transparent;
+
 }
 
 .button-auth {
   margin-top: 50px;
   margin-left: 10px;
   margin-right: 10px;
+  font-family: "Retro Gaming";
 }
 </style>

@@ -16,6 +16,7 @@ import {
   IonLabel,
     IonButtons,
     IonButton,
+    IonProgressBar,
   onIonViewDidEnter
 } from '@ionic/vue';
 import {
@@ -64,7 +65,6 @@ const fetchRetroGamePosts = async () => {
   if (response.status === 200 && response.data) {
     retroGamePosts.value = [...response.data.retroGames_posts];
   }
-  console.log(retroGamePosts.value)
 }
 
 const doRefresh = (event: CustomEvent) => {
@@ -80,29 +80,30 @@ const doRefresh = (event: CustomEvent) => {
       <ion-toolbar>
         <ion-title>NostalgiGames 🕹</ion-title>
         <ion-buttons slot="primary">
-          <ion-button router-link="/userPage">
+          <ion-button v-if="userAccessToken" router-link="/userPage">
             <ion-icon slot="icon-only" :icon="personCircleOutline"/>
           </ion-button>
           <ion-button router-link="/postsMap">
             <ion-icon slot="icon-only" :icon="mapOutline"/>
           </ion-button>
         </ion-buttons>
-      </ion-toolbar>
-      <ion-card>
-        <ion-card-content>
-          <p>Velkommen til Nostalgia Shop! Hos oss kan du se på annonser og kontakte selgere. Om du ønsker å legge ut
-            ditt eget annonse, så må du registrere deg og logge inn. </p>
-        </ion-card-content>
-      </ion-card>
+        <ion-progress-bar v-if="retroGamePosts.length <= 0" :buffer="0.001"></ion-progress-bar>
 
+      </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-refresher slot="fixed" pull-factor="0.5" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)">
+      <ion-refresher slot="fixed" pull-factor="0.8" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)">
         <ion-refresher-content :pulling-icon="chevronDownCircleOutline"
                                pulling-text="Pull to refresh"
                                refreshing-spinner="circles"
                                refreshing-text="Refreshing..."></ion-refresher-content>
       </ion-refresher>
+      <ion-card>
+        <ion-card-content>
+          <p>Velkommen til Nostalgia Shop! Her kan du se på annonser som er lagt ut! Om du ønsker å legge ut
+            ditt eget annonse, eller kontakte selgeren, så må du registrere deg og logge inn. </p>
+        </ion-card-content>
+      </ion-card>
 
       <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post"/>
 
@@ -141,11 +142,17 @@ p {
 }
 
 ion-label {
+  font-size: 12px;
+  margin: auto;
   white-space: nowrap;
   color: white;
   background-color: rgba(0, 0, 0, 0.7);
   line-height: 24px;
   padding: 4px 4px;
   border-radius: 4px;
+}
+
+ion-progress-bar{
+  --background: #52ffe4;
 }
 </style>
