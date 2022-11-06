@@ -18,7 +18,8 @@ import {
   IonChip,
   IonSelect,
   IonSelectOption,
-  IonCol
+  IonCol,
+  IonProgressBar
 } from "@ionic/vue";
 import {Camera, CameraResultType} from "@capacitor/camera";
 import {directus} from "@/services/directus.service";
@@ -46,6 +47,7 @@ newRetroGamePost.value.price = '' as unknown as number;
 const newRetroGamePostImages = ref([]);
 const newPlatForm = ref('');
 const status = ref(["Brukt", "Ubrukt", "Solgt"]);
+const isLoading = ref(false);
 
 const addNewPlatform = () => {
   if (newPlatForm.value) {
@@ -73,6 +75,7 @@ const postNewRetroGame = async () => {
   })
   newRetroGamePost.value.images = [...await Promise.all(imagesResult)];
   try {
+    isLoading.value = true;
     await directus.items('retroGames_posts').createOne({
       images: newRetroGamePost.value.images,
       title: newRetroGamePost.value.title,
@@ -132,6 +135,7 @@ const openCamera = async () => {
         </ion-buttons>
         <ion-title>Nostalgia Shop 🕹</ion-title>
       </ion-toolbar>
+      <ion-progress-bar v-if="isLoading" :buffer="0.001"></ion-progress-bar>
     </ion-header>
 
     <ion-content :fullscreen="true">

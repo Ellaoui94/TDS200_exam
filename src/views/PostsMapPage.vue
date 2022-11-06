@@ -10,7 +10,8 @@ import {
   IonBackButton,
   IonCard,
   IonCardContent,
-    IonItem
+  IonItem,
+  IonProgressBar, onIonViewWillLeave
 } from "@ionic/vue";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts";
 import {directus} from "@/services/directus.service";
@@ -60,10 +61,6 @@ const createMap = async () => {
     },
   });
 
-  const test = (id) => {
-    router.replace(`/postDetail/${id}`);
-  };
-
   retroGamePosts.value.map(async (post) => {
     const markerId = await newMap.addMarker({
       coordinate: {
@@ -71,17 +68,21 @@ const createMap = async () => {
         lng: post.location.coordinates[1]
       }
     });
-    /*await newMap.setOnMarkerClickListener((marker) => {
-      if (post.id >= 1){
-        router.replace(`/postDetail/${post.id}`);
+    await newMap.setOnMarkerClickListener((marker) => {
+      if (marker.latitude === post.location.coordinates[0] ){
+        router.replace(`/postDetail/${post.id}`)
       }
-    });*/
+    })
   });
 }
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
   await createMap();
+})
+
+onIonViewWillLeave(()=> {
+  location.reload();
 })
 
 </script>
@@ -96,6 +97,7 @@ onIonViewDidEnter(async () => {
         <ion-spinner v-if="!createMap" style="margin-left: 30px" name="circular"></ion-spinner>
         <p>Kart over annonser</p>
       </ion-toolbar>
+      <ion-progress-bar v-if="retroGamePosts.length === 0" :buffer="0.001"></ion-progress-bar>
     </ion-header>
     <ion-item>
     <ion-card>

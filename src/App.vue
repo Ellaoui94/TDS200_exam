@@ -18,14 +18,6 @@ export default defineComponent({
 </script>
 
 <style>
-* {
-  font-family: "Retro Gaming";
-  font-size: medium;
-}
-
-body {
-  background-color: #242424;
-}
 
 ion-spinner {
   --color: #52ffe4;
@@ -35,7 +27,13 @@ ion-button {
   --background: linear-gradient(43deg, #ff0000 0%, #ffa500 46%, #ff0000 100%);
 }
 
+ion-card{
+  --background: linear-gradient(#000000, #242424);
+  color: #ffffff;
+}
+
 ion-chip {
+  --background: #313030;
   color: #52ffe4;
 }
 

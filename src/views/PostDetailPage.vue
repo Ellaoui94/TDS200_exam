@@ -91,7 +91,6 @@ const getAddress = async () => {
 
 onIonViewDidEnter(async () => {
   await loadPost()
-  await getAddress();
   const {results} = await getAddress();
   address.value = results[0].formatted_address;
 })
@@ -141,10 +140,8 @@ const addNewComment = async () => {
 
     <ion-header v-else :translucent="true">
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button router-link="/"></ion-back-button>
-        </ion-buttons>
         <ion-title>{{ retroGamePost.title }}</ion-title>
+        <ion-button router-link="/" slot="start">Tilbake</ion-button>
       </ion-toolbar>
     </ion-header>
 
@@ -167,15 +164,15 @@ const addNewComment = async () => {
             </ion-col>
           </ion-row>
 
-          <ion-card-title>{{ retroGamePost.title }}</ion-card-title>
+          <h3>{{ retroGamePost.title }}</h3>
         </ion-card-header>
         <ion-card-content>
           {{ retroGamePost.description }}
           <ion-row>
-            <ion-col size="3">
-              <ion-card-title>Kr{{ retroGamePost.price }}</ion-card-title>
+            <ion-col size="4">
+              <h2>Kr{{ retroGamePost.price }}</h2>
             </ion-col>
-            <ion-col size="9">
+            <ion-col size="8">
               <ion-label>{{ address }}</ion-label>
             </ion-col>
           </ion-row>
@@ -204,7 +201,7 @@ const addNewComment = async () => {
                 <b>{{ comment.user_created.first_name }}</b>
               </ion-header>
               <ion-text>
-                <ion-card-subtitle>{{ comment.comment }}</ion-card-subtitle>
+                <h3>{{ comment.comment }}</h3>
               </ion-text>
             </ion-label>
           </ion-item>
@@ -216,13 +213,10 @@ const addNewComment = async () => {
           :breakpoints="[0, 0.25, 0.5, 0.75]"
           @did-dismiss="isModalOpen = false">
         <ion-content>
-          <ion-item lines="none">
-            <ion-label position="floating">Ny hate eller love?</ion-label>
-            <ion-textarea v-model="newCommentText"></ion-textarea>
-            <ion-button class="modalBtn" @click="addNewComment">
+            <ion-textarea style="resize: both" placeholder="Legg igjen en kommentar" v-model="newCommentText"></ion-textarea>
+            <ion-button style="width: 100%" class="modalBtn" @click="addNewComment">
               <ion-icon :icon="sendSharp"/>
             </ion-button>
-          </ion-item>
         </ion-content>
       </ion-modal>
     </ion-content>
@@ -239,8 +233,16 @@ const addNewComment = async () => {
   border: 15px solid transparent;
 }
 
+h3, h2{
+  color: #ffffff;
+}
+
 .modalBtn {
   --background: linear-gradient(43deg, #ff0000 0%, #ffa500 46%, #ff0000 100%);
+}
+
+ion-modal{
+  --background: #000000;
 }
 
 </style>
