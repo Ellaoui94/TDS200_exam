@@ -245,4 +245,8 @@ ion-modal{
   --background: #000000;
 }
 
+ion-list-header, ion-item{
+  --background: linear-gradient(#000000, #242424);
+}
+
 </style>

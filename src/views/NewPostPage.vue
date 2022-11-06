@@ -219,4 +219,8 @@ ion-list {
 ion-button {
   color: black;
 }
+
+ion-chip{
+  background-color: #000000;
+}
 </style>

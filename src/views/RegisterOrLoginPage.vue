@@ -15,18 +15,16 @@ import {
   IonList,
   IonPage,
   IonButtons,
+    IonProgressBar,
   toastController, onIonViewDidLeave
 } from '@ionic/vue';
 import {Camera, CameraResultType} from "@capacitor/camera";
 import IUserDetails from "@/Interface/IUserDetails";
 import defaultUserImage from "@/components/defaultUserImage";
 
-onIonViewDidLeave(() => {
-  location.reload();
-})
-
 let registerMode = ref(false);
 let segmentDefMode = ref('login');
+const isLoading = ref(false);
 const router = useRouter();
 
 
@@ -41,6 +39,7 @@ const userDetails = ref<IUserDetails>({
 });
 
 const login = async () => {
+  isLoading.value = true
   try {
     await authService.login(userDetails.value.email, userDetails.value.password);
     await router.replace('/home');
@@ -55,6 +54,7 @@ const login = async () => {
 
 
 const register = async () => {
+  isLoading.value = true
   try {
     let res = await fetch(userDetails.value.avatar.id)
 
@@ -77,6 +77,14 @@ const register = async () => {
     }
     await login();
   } catch (e) {
+    if (e.message == "\"refresh_token\" is required in either the JSON payload or Cookie"){
+      await (await toastController.create({
+        message: `Du må trykke en gang til. Beklager, vi jobber med å fikse dette problemet`,
+        duration: 3000,
+        color: "warning"
+      })).present();
+      return;
+    }
     await (await toastController.create({
       message: `${e}`,
       duration: 3000,
@@ -114,6 +122,7 @@ const openCamera = async () => {
               </ion-segment-button>
             </ion-segment>
           </ion-toolbar>
+          <ion-progress-bar v-if="isLoading" :buffer="0.001"></ion-progress-bar>
         </ion-header>
 
         <ion-button v-if="!userDetails.avatar.id && registerMode" @click="openCamera" color="light" class="imageBtn">

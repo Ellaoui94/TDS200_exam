@@ -17,6 +17,7 @@ import {
   IonButtons,
   IonButton,
   IonProgressBar,
+  IonSearchbar,
   onIonViewDidEnter, onIonViewWillEnter, onIonViewDidLeave
 } from '@ionic/vue';
 import {
@@ -46,7 +47,7 @@ const loggOff = () => {
 }
 
 const fetchRetroGamePosts = async () => {
-  const response = await directus.graphql.items<IRetroGamePosts>(`
+  const fullResponse = await directus.graphql.items<IRetroGamePosts>(`
   query MyQuery {
   retroGames_posts {
     id
@@ -65,8 +66,8 @@ const fetchRetroGamePosts = async () => {
 }
 `)
 
-  if (response.status === 200 && response.data) {
-    retroGamePosts.value = [...response.data.retroGames_posts];
+  if (fullResponse.status === 200 && fullResponse.data) {
+    retroGamePosts.value = [...fullResponse.data.retroGames_posts];
   }
 }
 
@@ -75,6 +76,32 @@ const doRefresh = (event: CustomEvent) => {
   event.target.complete();
 }
 
+const handleChange = async (event) => {
+  const query = event.target.value.toLowerCase();
+  if (query == ''){
+    await fetchRetroGamePosts();
+  }
+  const filterResponse = await directus.graphql.items<IRetroGamePosts>(`
+ query MyQuery {
+ retroGames_posts(filter: {title: {_contains: "${query}"}}) {
+   id
+   images {
+     id
+   }
+   title
+   description
+   plattform
+   state
+   location
+ }
+}
+
+`)
+
+  if (filterResponse.status === 200 && filterResponse.data) {
+    retroGamePosts.value = [...filterResponse.data.retroGames_posts];
+  }
+}
 </script>
 
 <template>
@@ -90,8 +117,8 @@ const doRefresh = (event: CustomEvent) => {
             <ion-icon slot="icon-only" :icon="mapOutline"/>
           </ion-button>
         </ion-buttons>
+        <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" />
         <ion-progress-bar v-if="retroGamePosts.length <= 0" :buffer="0.001"></ion-progress-bar>
-
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">

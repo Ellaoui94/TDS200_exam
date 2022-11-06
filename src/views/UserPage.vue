@@ -26,18 +26,51 @@ import {
 import {defineProps, ref} from "vue";
 import {createOutline} from "ionicons/icons";
 import {useRouter} from "vue-router";
+import IRetroGamePosts from "@/Interface/IRetroGamePosts";
+import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 
 const currentUser = ref({});
 const router = useRouter();
 const isModalOpen = ref(false);
 
+const retroGamePosts = ref<IRetroGamePosts>([]);
+
+
+const fetchRetroGamePosts = async () => {
+  const response = await directus.graphql.items<IRetroGamePosts>(`
+ query MyQuery {
+  retroGames_posts(filter: {user_created: {email: {_eq: "${currentUser.value.email}"}}}) {
+    id
+    images {
+       directus_files_id {
+        id
+      }
+    }
+    title
+    description
+    plattform
+    state
+    location
+  }
+}
+
+`)
+
+  if (response.status === 200 && response.data) {
+    retroGamePosts.value = [...response.data.retroGames_posts];
+  }
+}
+
+
 onIonViewDidEnter(async () => {
   currentUser.value = await authService.currentUser();
+  await fetchRetroGamePosts();
 })
 
 const deleteCurrentUser = async () => {
   await directus.users.deleteOne(currentUser.value.id);
   localStorage.removeItem('auth_token');
+  location.reload();
   await router.replace('/');
 }
 
@@ -115,6 +148,15 @@ const presentActionSheet = async () => {
           Slett bruker 😢
         </ion-button>
       </ion-buttons>
+
+      <ion-card>
+        <ion-card-content>
+          <p>Annonser lagt ut av deg </p>
+        </ion-card-content>
+      </ion-card>
+
+      <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post"/>
+
       <ion-modal :is-open="isModalOpen" @did-dismiss="isModalOpen = false">
         <ion-content>
           <ion-toolbar>
