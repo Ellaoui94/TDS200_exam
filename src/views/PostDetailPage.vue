@@ -233,7 +233,7 @@ const addNewComment = async () => {
   border: 15px solid transparent;
 }
 
-h3, h2{
+h3, h2, ion-card-title, ion-icon{
   color: #ffffff;
 }
 
@@ -245,8 +245,10 @@ ion-modal{
   --background: #000000;
 }
 
+
 ion-list-header, ion-item{
   --background: linear-gradient(#000000, #242424);
+  color: #FFFFFF;
 }
 
 </style>
