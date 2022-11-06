@@ -15,6 +15,7 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonButton,
+    IonProgressBar,
   onIonViewDidEnter, actionSheetController
 } from "@ionic/vue";
 import {defineProps, ref} from "vue";
@@ -78,7 +79,7 @@ const presentActionSheet = async () => {
         <ion-buttons slot="start">
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
-        <ion-spinner v-if="!currentUser.avatar" style="margin-left: 30px" name="circular"></ion-spinner>
+        <ion-progress-bar v-if="!currentUser.avatar" :buffer="0.001"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">

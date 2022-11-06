@@ -38,4 +38,8 @@ ion-button {
 ion-chip {
   color: #52ffe4;
 }
+
+ion-progress-bar{
+  --background: #52ffe4;
+}
 </style>

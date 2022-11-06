@@ -69,5 +69,8 @@ ion-card {
   border-radius: 5px;
   border: 15px solid transparent;
 }
+ion-card-title{
+  color: #ffffff;
+}
 </style>
 

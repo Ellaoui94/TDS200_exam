@@ -1,28 +1,42 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {IonPage, IonContent, IonHeader, IonToolbar, IonButtons, IonSpinner, IonBackButton} from "@ionic/vue";
+import {
+  IonPage,
+  IonContent,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonSpinner,
+  IonBackButton,
+  IonCard,
+  IonCardContent,
+    IonItem
+} from "@ionic/vue";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts";
 import {directus} from "@/services/directus.service";
 import {GoogleMap} from "@capacitor/google-maps";
 import {onIonViewDidEnter} from "@ionic/vue";
+import {useRouter} from "vue-router";
 
 const retroGamePosts = ref<IRetroGamePosts>([]);
+const router = useRouter();
 
 const fetchRetroGamePosts = async () => {
   const response = await directus.graphql.items<IRetroGamePosts>(`
   query MyQuery {
   retroGames_posts {
-    title
-    description
+    id
     images {
       directus_files_id {
         id
       }
     }
+    title
+    description
     location
   }
 }
-`)
+`);
 
   if (response.status === 200 && response.data) {
     retroGamePosts.value = [...response.data.retroGames_posts];
@@ -46,6 +60,10 @@ const createMap = async () => {
     },
   });
 
+  const test = (id) => {
+    router.replace(`/postDetail/${id}`);
+  };
+
   retroGamePosts.value.map(async (post) => {
     const markerId = await newMap.addMarker({
       coordinate: {
@@ -53,13 +71,19 @@ const createMap = async () => {
         lng: post.location.coordinates[1]
       }
     });
+    /*await newMap.setOnMarkerClickListener((marker) => {
+      if (post.id >= 1){
+        router.replace(`/postDetail/${post.id}`);
+      }
+    });*/
   });
-};
+}
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
   await createMap();
 })
+
 </script>
 
 <template>
@@ -70,10 +94,17 @@ onIonViewDidEnter(async () => {
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-spinner v-if="!createMap" style="margin-left: 30px" name="circular"></ion-spinner>
+        <p>Kart over annonser</p>
       </ion-toolbar>
     </ion-header>
+    <ion-item>
+    <ion-card>
+      <ion-card-content>
+        <p style="opacity: 102"> Her finner annonser der hvor de er postet fra, trykk på en for mer info</p>
+      </ion-card-content>
+    </ion-card>
+    </ion-item>
     <ion-content :fullscreen="true">
-      <p>tetestg</p>
       <capacitor-google-map id="map"></capacitor-google-map>
     </ion-content>
   </ion-page>
@@ -85,9 +116,17 @@ capacitor-google-map {
   display: block;
   margin: auto;
   width: auto;
-  height: 400px;
+  height: 100%;
   border: 5px solid;
   border-radius: 5px;
+}
+
+ion-content {
+  --background: none;
+}
+
+body {
+  opacity: 0.2;
 }
 
 </style>

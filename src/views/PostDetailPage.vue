@@ -22,6 +22,7 @@ import {
   IonCol,
   IonAvatar, IonText, IonItem, IonListHeader, IonLabel, IonList, IonSpinner, IonTextarea,
   IonCardSubtitle,
+    IonProgressBar,
   IonModal, onIonViewDidEnter, toastController
 } from "@ionic/vue";
 
@@ -133,7 +134,8 @@ const addNewComment = async () => {
         <ion-buttons slot="start">
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
-        <ion-spinner style="margin-left: 30px" name="circular"></ion-spinner>
+        <ion-title v-if="retroGamePost.images">{{ retroGamePost.title }}</ion-title>
+        <ion-progress-bar v-else :buffer="0.001"></ion-progress-bar>
       </ion-toolbar>
     </ion-header>
 

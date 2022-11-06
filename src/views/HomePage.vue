@@ -154,8 +154,4 @@ ion-label {
   padding: 4px 4px;
   border-radius: 4px;
 }
-
-ion-progress-bar{
-  --background: #52ffe4;
-}
 </style>
