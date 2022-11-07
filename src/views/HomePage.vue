@@ -31,11 +31,12 @@ import {ref} from 'vue';
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 import {authService, directus} from "@/services/directus.service";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts"
-import router from "@/router";
+import {useRouter} from "vue-router";
 
 const userAccessToken = localStorage.getItem('auth_token');
 
 const retroGamePosts = ref<IRetroGamePosts>([]);
+const router = useRouter();
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
