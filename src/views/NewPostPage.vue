@@ -3,6 +3,8 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonChip,
+  IonCol,
   IonContent,
   IonGrid,
   IonHeader,
@@ -11,15 +13,14 @@ import {
   IonLabel,
   IonList,
   IonPage,
+  IonProgressBar,
   IonRow,
-  IonTextarea,
-  IonTitle,
-  IonToolbar, toastController,
-  IonChip,
   IonSelect,
   IonSelectOption,
-  IonCol,
-  IonProgressBar
+  IonTextarea,
+  IonTitle,
+  IonToolbar,
+  toastController
 } from "@ionic/vue";
 import {Camera, CameraResultType} from "@capacitor/camera";
 import {directus} from "@/services/directus.service";

@@ -1,30 +1,26 @@
 <script setup lang="ts">
 import {authService, directus} from "@/services/directus.service";
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonSpinner,
-  IonContent,
+  actionSheetController,
   IonAvatar,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonCardTitle,
-  IonCardSubtitle,
+  IonBackButton,
   IonButton,
-    IonProgressBar,
-    IonLabel,
-    IonModal,
-    IonItem,
-    IonInput,
-    IonIcon,
-  onIonViewDidEnter, actionSheetController
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonContent,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonModal,
+  IonPage,
+  IonProgressBar,
+  IonToolbar,
+  onIonViewDidEnter
 } from "@ionic/vue";
-import {defineProps, ref} from "vue";
-import {createOutline} from "ionicons/icons";
+import {ref} from "vue";
 import {useRouter} from "vue-router";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts";
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";

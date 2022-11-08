@@ -4,19 +4,20 @@ import {authService, directus} from "@/services/directus.service";
 import {useRouter} from "vue-router";
 import {
   IonButton,
-  IonSegment,
-  IonSegmentButton,
-  IonToolbar,
-  IonHeader,
+  IonButtons,
   IonContent,
+  IonHeader,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonPage,
-  IonButtons,
-    IonProgressBar,
-  toastController, onIonViewDidLeave
+  IonProgressBar,
+  IonSegment,
+  IonSegmentButton,
+  IonToolbar,
+  onIonViewDidLeave,
+  toastController
 } from '@ionic/vue';
 import {Camera, CameraResultType} from "@capacitor/camera";
 import IUserDetails from "@/Interface/IUserDetails";

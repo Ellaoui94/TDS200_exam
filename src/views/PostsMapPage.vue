@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {
-  IonPage,
-  IonContent,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonSpinner,
   IonBackButton,
+  IonButtons,
   IonCard,
   IonCardContent,
+  IonContent,
+  IonHeader,
   IonItem,
-  IonProgressBar, onIonViewWillLeave
+  IonPage,
+  IonProgressBar,
+  IonSpinner,
+  IonToolbar,
+  onIonViewDidEnter,
+  onIonViewWillLeave
 } from "@ionic/vue";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts";
 import {directus} from "@/services/directus.service";
 import {GoogleMap} from "@capacitor/google-maps";
-import {onIonViewDidEnter} from "@ionic/vue";
 import {useRouter} from "vue-router";
 
 const retroGamePosts = ref<IRetroGamePosts>([]);

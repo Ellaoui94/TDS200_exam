@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import {
+  IonAvatar,
+  IonButton,
   IonCard,
-  IonText,
-  IonTextarea,
+  IonContent,
+  IonHeader,
   IonIcon,
   IonItem,
-  IonAvatar,
   IonLabel,
-  IonHeader,
-  IonTitle,
-  IonButton,
-  IonToolbar,
   IonList,
   IonPage,
-  IonContent,
-  toastController,
-  onIonViewDidEnter
+  IonText,
+  IonTextarea,
+  IonTitle,
+  IonToolbar,
+  onIonViewDidEnter,
+  toastController
 } from "@ionic/vue";
 import {useRoute} from "vue-router";
 import {authService, directus} from "@/services/directus.service";

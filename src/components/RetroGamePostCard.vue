@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonRow, IonCol, IonSlides, IonChip} from "@ionic/vue";
+import {IonCard, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonCol, IonRow, IonSlides} from "@ionic/vue";
 import RetroGamePostImage from "@/components/RetroGamePostImage.vue";
 import {defineProps} from "vue";
 

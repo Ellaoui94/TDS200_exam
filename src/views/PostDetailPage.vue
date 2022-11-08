@@ -2,35 +2,39 @@
 /* eslint-disable no-undef */
 import {useRoute} from "vue-router";
 import {
+  IonAvatar,
   IonBackButton,
+  IonButton,
   IonButtons,
   IonCard,
-  IonCardHeader,
   IonCardContent,
+  IonCardHeader,
   IonCardTitle,
+  IonChip,
+  IonCol,
   IonContent,
   IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonListHeader,
+  IonModal,
   IonPage,
+  IonProgressBar,
+  IonRow,
+  IonSlides,
+  IonText,
+  IonTextarea,
   IonTitle,
   IonToolbar,
-  IonButton,
-  IonIcon,
-  IonChip,
-  IonSlides,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonAvatar, IonText, IonItem, IonListHeader, IonLabel, IonList, IonSpinner, IonTextarea,
-  IonCardSubtitle,
-    IonProgressBar,
-  IonModal, onIonViewDidEnter, toastController
+  onIonViewDidEnter,
+  toastController
 } from "@ionic/vue";
 
-import {chatboxOutline, sendSharp, mailOutline} from 'ionicons/icons';
+import {chatboxOutline, mailOutline, sendSharp} from 'ionicons/icons';
 import {ref} from "vue";
-import {Geolocation} from '@capacitor/geolocation';
 import {directus} from "@/services/directus.service";
-import CampingSpotImage from "@/components/CampingSpotImage.vue"
 import RetroGamePostImage from "@/components/RetroGamePostImage.vue";
 
 const route = useRoute();

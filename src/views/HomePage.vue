@@ -1,32 +1,34 @@
 <script setup lang="ts">
 import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonRefresher,
-  IonRefresherContent,
+  IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
+  IonContent,
   IonFab,
   IonFabButton,
   IonFabList,
+  IonHeader,
   IonIcon,
   IonLabel,
-  IonButtons,
-  IonButton,
+  IonPage,
   IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
   IonSearchbar,
-  onIonViewDidEnter, onIonViewWillEnter, onIonViewDidLeave
+  IonTitle,
+  IonToolbar,
+  onIonViewDidEnter
 } from '@ionic/vue';
 import {
   addCircleOutline,
   chevronDownCircleOutline,
+  logIn,
+  logOut,
+  mapOutline,
+  personCircleOutline,
   settings,
-  logIn, logOut,
 } from "ionicons/icons";
-import {personCircleOutline, mapOutline} from "ionicons/icons";
 import {ref} from 'vue';
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 import {authService, directus} from "@/services/directus.service";
