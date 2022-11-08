@@ -6,6 +6,7 @@ import RegisterOrLoginPage from '../views/RegisterOrLoginPage.vue'
 import PostsMapPage from '../views/PostsMapPage.vue'
 import PostDetailPage from '../views/PostDetailPage.vue'
 import UserPage from '../views/UserPage.vue'
+import PostChatPage from '../views/PostChatPage.vue'
 import {toastController} from "@ionic/vue";
 import {authService} from "@/services/directus.service";
 
@@ -64,6 +65,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/postDetail/:id',
     name: 'PostDetailPage',
     component: PostDetailPage,
+  },
+  {
+    path: '/postChat/:id/:email',
+    name: 'PostChatPage',
+    component: PostChatPage,
   },
   {
     path: '/userPage',

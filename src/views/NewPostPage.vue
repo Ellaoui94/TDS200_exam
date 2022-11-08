@@ -61,6 +61,10 @@ const postNewRetroGame = async () => {
     alert("Må ha med bilde(r) av produktet")
     return;
   }
+  if (newRetroGamePost.value.price == '') {
+    alert('Pris må bli oppgit');
+    return;
+  }
   const imagesResult = newRetroGamePostImages.value.map(async (image) => {
     const res = await fetch(image)
     const imgBlob = await res.blob();
@@ -76,6 +80,9 @@ const postNewRetroGame = async () => {
   newRetroGamePost.value.images = [...await Promise.all(imagesResult)];
   try {
     isLoading.value = true;
+    if (newRetroGamePost.value.location.coordinates.length === 0) {
+      newRetroGamePost.value.location = {type: 'Point', coordinates: [0, 0]};
+    }
     await directus.items('retroGames_posts').createOne({
       images: newRetroGamePost.value.images,
       title: newRetroGamePost.value.title,
@@ -220,7 +227,7 @@ ion-button {
   color: black;
 }
 
-ion-chip{
+ion-chip {
   background-color: #000000;
 }
 </style>

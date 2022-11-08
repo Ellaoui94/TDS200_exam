@@ -27,6 +27,9 @@ let segmentDefMode = ref('login');
 const isLoading = ref(false);
 const router = useRouter();
 
+onIonViewDidLeave(()=> {
+  location.reload();
+})
 
 //Trenger kanskje ikke interface????????????
 const userDetails = ref<IUserDetails>({

@@ -109,7 +109,7 @@ const handleChange = async (event) => {
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>NostalgiGames 🕹</ion-title>
+        <ion-title>NostalgiShop 🕹</ion-title>
         <ion-buttons slot="primary">
           <ion-button v-if="userAccessToken" router-link="/userPage">
             <ion-icon slot="icon-only" :icon="personCircleOutline"/>

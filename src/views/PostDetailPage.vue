@@ -26,7 +26,7 @@ import {
   IonModal, onIonViewDidEnter, toastController
 } from "@ionic/vue";
 
-import {chatboxOutline, sendSharp} from 'ionicons/icons';
+import {chatboxOutline, sendSharp, mailOutline} from 'ionicons/icons';
 import {ref} from "vue";
 import {Geolocation} from '@capacitor/geolocation';
 import {directus} from "@/services/directus.service";
@@ -60,6 +60,9 @@ query MyQuery {
     price
     state
     location
+     user_created {
+        email
+     }
     retroGame_post_comments_fk {
       id
       comment
@@ -142,6 +145,9 @@ const addNewComment = async () => {
       <ion-toolbar>
         <ion-title>{{ retroGamePost.title }}</ion-title>
         <ion-button router-link="/" slot="start">Tilbake</ion-button>
+        <ion-button :router-link="'/postChat/' + retroGamePost.id + '/' + retroGamePost.user_created.email" slot="end">
+          <ion-icon slot="icon-only" :icon="mailOutline"/>
+        </ion-button>
       </ion-toolbar>
     </ion-header>
 
