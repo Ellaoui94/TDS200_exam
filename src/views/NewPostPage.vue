@@ -30,6 +30,8 @@ import {Geolocation} from '@capacitor/geolocation';
 import {useRouter} from "vue-router";
 
 const router = useRouter();
+
+//Felter som skal fylles
 const newRetroGamePost = ref({
   images: {},
   title: '',
@@ -43,13 +45,14 @@ const newRetroGamePost = ref({
   },
 })
 
-newRetroGamePost.value.price = '' as unknown as number;
+newRetroGamePost.value.price = '' as unknown as number; //Siden jeg måtte ha med 0, men ville ikke vise tallet i input feltet, så har jeg gjort det om slik at feltet er tomt
 
 const newRetroGamePostImages = ref([]);
 const newPlatForm = ref('');
-const status = ref(["Brukt", "Ubrukt", "Solgt"]);
+const status = ref(["Brukt", "Ubrukt", "Solgt"]); // For select
 const isLoading = ref(false);
 
+//Legge til innhold i et array som blir sendt til directus
 const addNewPlatform = () => {
   if (newPlatForm.value) {
     newRetroGamePost.value.plattform.push(newPlatForm.value)
@@ -57,6 +60,20 @@ const addNewPlatform = () => {
   }
 }
 
+//Legger til bilde som blir tatt til et array
+const openCamera = async () => {
+  const pic = await Camera.getPhoto({
+    quality: 100,
+    allowEditing: false,
+    resultType: CameraResultType.Uri
+  })
+
+  if (pic.webPath) {
+    newRetroGamePostImages.value.push(pic.webPath)
+  }
+}
+
+//Lagt til restriksjoner hvor bilder og pris må være med før man poster
 const postNewRetroGame = async () => {
   if (newRetroGamePostImages.value.length === 0) {
     alert("Må ha med bilde(r) av produktet")
@@ -66,6 +83,8 @@ const postNewRetroGame = async () => {
     alert('Pris må bli oppgit');
     return;
   }
+
+  //Mapper gjennom tidligere nevnt bildearray og lager et objeckt med id for hver av dem i en variabel
   const imagesResult = newRetroGamePostImages.value.map(async (image) => {
     const res = await fetch(image)
     const imgBlob = await res.blob();
@@ -78,12 +97,18 @@ const postNewRetroGame = async () => {
       }
     }
   })
+
+  //Siden imageResult er en promise så må jeg awaite hver av dem, gjør dette med Promise.all, og legger til i tidligerenevnt array
   newRetroGamePost.value.images = [...await Promise.all(imagesResult)];
+
   try {
     isLoading.value = true;
+
+    //Siden poster uten kordinater ikke vises på HomePage, så måtte jeg gi dem et deafult verdi, hvis man velger å ikke ha det med
     if (newRetroGamePost.value.location.coordinates.length === 0) {
       newRetroGamePost.value.location = {type: 'Point', coordinates: [0, 0]};
     }
+
     await directus.items('retroGames_posts').createOne({
       images: newRetroGamePost.value.images,
       title: newRetroGamePost.value.title,
@@ -104,11 +129,13 @@ const postNewRetroGame = async () => {
   }
 }
 
+//Henter kordinater gjennom Geolocation
 const printCurrentPosition = async () => {
   const coordinates = await Geolocation.getCurrentPosition()
   return coordinates.coords
 };
 
+//Legger til kordinatene i posten som jeg skal sende
 printCurrentPosition().then((s) => {
   newRetroGamePost.value.location = {
     type: "Point",
@@ -120,18 +147,6 @@ printCurrentPosition().then((s) => {
 
 });
 
-
-const openCamera = async () => {
-  const pic = await Camera.getPhoto({
-    quality: 100,
-    allowEditing: false,
-    resultType: CameraResultType.Uri
-  })
-
-  if (pic.webPath) {
-    newRetroGamePostImages.value.push(pic.webPath)
-  }
-}
 </script>
 
 <template>
@@ -141,7 +156,7 @@ const openCamera = async () => {
         <ion-buttons slot="start">
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
-        <ion-title>Nostalgia Shop 🕹</ion-title>
+        <ion-title>NostalgiShop🕹</ion-title>
       </ion-toolbar>
       <ion-progress-bar v-if="isLoading" :buffer="0.001"></ion-progress-bar>
     </ion-header>
@@ -153,6 +168,7 @@ const openCamera = async () => {
           et bilde 📸
         </ion-button>
 
+        <!--Bilder som blir lagt til i arrayet vises gjennom en grid -->
         <ion-grid v-if="newRetroGamePostImages.length">
           <ion-row>
             <retro-game-new-post-images v-for="image in newRetroGamePostImages" :key="image"
@@ -188,7 +204,7 @@ const openCamera = async () => {
           <ion-col>
             <ion-item>
               <ion-select interface="action-sheet" placeholder="Velg tilstand"
-                          @ionChange="newRetroGamePost.state = $event.detail.value">
+                          @ionChange="newRetroGamePost.state = $event.detail.value"> <!--Henter verdi fra selecten-->
                 <ion-select-option v-for="state in status" :key="state" :value="state">{{ state }}</ion-select-option>
               </ion-select>
             </ion-item>

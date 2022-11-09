@@ -35,15 +35,20 @@ import {authService, directus} from "@/services/directus.service";
 import IRetroGamePosts from "@/Interface/IRetroGamePosts"
 import {useRouter} from "vue-router";
 
+// Bruker auth_token for å sjekke om brukeren er logget inn eller ikke, lag til mer detaljert forklaring på template delen
 const userAccessToken = localStorage.getItem('auth_token');
 
+// Lager et tomt array av typen IRetroGamePosts som skall fylles med verdier fra fethcRetroGamePosts
 const retroGamePosts = ref<IRetroGamePosts>([]);
+
+//For å kunne gå til ønsket side
 const router = useRouter();
 
 onIonViewDidEnter(async () => {
   await fetchRetroGamePosts();
 })
 
+// Sletter auth_token og går tilbake til login/registrer siden
 const loggOff = () => {
   authService.logout()
   router.replace('/auth');
@@ -74,13 +79,16 @@ const fetchRetroGamePosts = async () => {
   }
 }
 
-const doRefresh = (event: CustomEvent) => {
-  fetchRetroGamePosts();
+//Når man drar ned på siden, så blir fetch fuknsjonen kalt på nytt, og deretter stopper
+const doRefresh = async (event: CustomEvent) => {
+  await fetchRetroGamePosts();
   event.target.complete();
 }
 
-const handleChange = async (event) => {
+// For hver gang et tegn blir lagt til i søkefeltet så flitrer den innholdet til tidligere nevnt array utifra søkefeltet
+const handleChange = async (event: CustomEvent) => {
   const query = event.target.value.toLowerCase();
+  //Hvis felter er tomt, så skal tidligere nevnt funksjon kjøres
   if (query == ''){
     await fetchRetroGamePosts();
   }
@@ -113,6 +121,7 @@ const handleChange = async (event) => {
       <ion-toolbar>
         <ion-title>NostalgiShop 🕹</ion-title>
         <ion-buttons slot="primary">
+          <!--Man skal kunne gå til bruker siden hvis man er logget inn-->
           <ion-button v-if="userAccessToken" router-link="/userPage">
             <ion-icon slot="icon-only" :icon="personCircleOutline"/>
           </ion-button>
@@ -120,12 +129,12 @@ const handleChange = async (event) => {
             <ion-icon slot="icon-only" :icon="mapOutline"/>
           </ion-button>
         </ion-buttons>
-        <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" />
-        <ion-progress-bar v-if="retroGamePosts.length <= 0" :buffer="0.001"></ion-progress-bar>
+        <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" /> <!--Forklart i typescript-->
+        <ion-progress-bar v-if="retroGamePosts.length <= 0" :buffer="0.001"></ion-progress-bar> <!--Skal kun vises når fetch arrayet av posts er tomt-->
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-refresher slot="fixed" pull-factor="0.8" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)">
+      <ion-refresher slot="fixed" pull-factor="0.8" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)"> <!--Forklart i typescript-->
         <ion-refresher-content :pulling-icon="chevronDownCircleOutline"
                                pulling-text="Pull to refresh"
                                refreshing-spinner="circles"
@@ -133,14 +142,14 @@ const handleChange = async (event) => {
       </ion-refresher>
       <ion-card>
         <ion-card-content>
-          <p>Velkommen til Nostalgia Shop! Her kan du se på annonser som er lagt ut! Om du ønsker å legge ut
+          <p>Velkommen til NostalgiShop! Her kan du se på annonser som er lagt ut! Om du ønsker å legge ut
             ditt eget annonse, eller kontakte selgeren, så må du registrere deg og logge inn. </p>
         </ion-card-content>
       </ion-card>
 
-      <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post"/>
+      <retro-game-post-card v-for="post in retroGamePosts" :key="post.id" :post="post"/> <!--Bruker komponent med props-->
 
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed"> <!--Viser kun loggin knappen hvis man ikke er logget inn-->
         <ion-fab-button>
           <ion-icon :icon="settings"></ion-icon>
         </ion-fab-button>

@@ -14,6 +14,7 @@ import {
   IonTextarea,
   IonTitle,
   IonToolbar,
+  IonProgressBar,
   onIonViewDidEnter,
   toastController
 } from "@ionic/vue";
@@ -25,6 +26,7 @@ import {ref} from "vue";
 const route = useRoute();
 const {id, email} = route.params;
 
+const isLoading = ref(false);
 const newMessageText = ref('');
 const postOwnerChat = ref([]);
 const postCustomerChat = ref([]);
@@ -81,7 +83,7 @@ query MyQuery {
   }
 
 
-  if (postCustomerChat.value.length == 0){
+  if (postCustomerChat.value.length == 0) {
     postOwnerChat.value = [];
   }
 
@@ -90,11 +92,13 @@ query MyQuery {
   allMessagesArray.value.sort(
       (owner, customer) => Number(new Date(owner.date_created)) - Number(new Date(customer.date_created)),
   );
+
+  isLoading.value = false
 }
 const addNewMessage = async () => {
   if (newMessageText.value) {
     try {
-      const res = await directus.items('retroGames_post_chat').createOne({
+      await directus.items('retroGames_post_chat').createOne({
         message: newMessageText.value,
         retroGames_post_fk: id,
       })
@@ -116,11 +120,12 @@ const addNewMessage = async () => {
   }
 
   newMessageText.value = "";
+  isLoading.value = true
   await loadChat();
 }
 
-onIonViewDidEnter(()=>{
-  loadChat();
+onIonViewDidEnter(async () => {
+  await loadChat();
 })
 
 setInterval(async () => {
@@ -135,13 +140,14 @@ setInterval(async () => {
         <ion-title>test</ion-title>
         <ion-button router-link="/" slot="start">Tilbake</ion-button>
       </ion-toolbar>
+      <ion-progress-bar v-if="isLoading" :buffer="0.001"></ion-progress-bar>
     </ion-header>
     <ion-content>
       <ion-list>
         <ion-card>
           <ion-item v-for="msg in allMessagesArray" :key="msg" lines="none">
             <ion-avatar slot="start">
-              <img :src="`https://7qp4jl4l.directus.app/assets/${msg.user_created.avatar.id}`"/>
+              <img :src="`https://7qp4jl4l.directus.app/assets/${msg.user_created.avatar.id}`" alt="User Image"/>
             </ion-avatar>
             <ion-label class="ion-text-wrap">
               <ion-header>
