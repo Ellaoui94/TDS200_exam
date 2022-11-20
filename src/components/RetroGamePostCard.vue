@@ -26,6 +26,8 @@ interface Props {
   },
 }
 
+//Har bildne inni en slides for å kunne scrolle på bildene, hvært bilde får en ion-slide, som står i komponenten
+
 const props = defineProps<Props>()
 </script>
 

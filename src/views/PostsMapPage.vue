@@ -15,7 +15,7 @@ import {
   onIonViewDidEnter,
   onIonViewWillLeave
 } from "@ionic/vue";
-import IRetroGamePosts from "@/Interface/IRetroGamePosts";
+import IRetroGamePosts from "@/Interface/IRetroGamePost";
 import {directus} from "@/services/directus.service";
 import {GoogleMap} from "@capacitor/google-maps";
 import {useRouter} from "vue-router";
@@ -46,7 +46,7 @@ const fetchRetroGamePosts = async () => {
 }
 
 const createMap = async () => {
-  const mapRef = document.getElementById('map');
+  const mapRef = document.getElementById('map'); //Henter elementet/div-en som har id-en "Kartet"
 
   const newMap = await GoogleMap.create({
     id: 'my-map', // Unique identifier for this map instance
@@ -56,21 +56,24 @@ const createMap = async () => {
       center: {
         // The initial position to be rendered by the map
         lat: 59.911491,
-        lng: 10.757933,
+        lng: 10.757933, // Oslo
       },
       zoom: 10, // The initial zoom level to be rendered by the map
     },
   });
 
+  //Mapper gjennom artikler for å hente alle artiklene som finnes og legger til kordinatene deres
   retroGamePosts.value.map(async (post) => {
-    const markerId = await newMap.addMarker({
+    await newMap.addMarker({
       coordinate: {
         lat: post.location.coordinates[0],
         lng: post.location.coordinates[1]
       }
     });
+
+    //Henter id-en fra posten som markøren gjelder. Hvis jeg ikke har med if-statement, så blir hvert markør det siste innholdet i arrayet
     await newMap.setOnMarkerClickListener((marker) => {
-      if (marker.latitude === post.location.coordinates[0] ){
+      if (marker.latitude === post.location.coordinates[0]) {
         router.replace(`/postDetail/${post.id}`)
       }
     })
@@ -82,7 +85,8 @@ onIonViewDidEnter(async () => {
   await createMap();
 })
 
-onIonViewWillLeave(()=> {
+//Bruker location.reload for å fikse loading buggen
+onIonViewWillLeave(() => {
   location.reload();
 })
 
@@ -96,16 +100,17 @@ onIonViewWillLeave(()=> {
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
         <ion-spinner v-if="!createMap" style="margin-left: 30px" name="circular"></ion-spinner>
+        <!--For å teste og se at både spinner og progressbar fungerer-->
         <p>Kart over annonser</p>
       </ion-toolbar>
       <ion-progress-bar v-if="retroGamePosts.length === 0" :buffer="0.001"></ion-progress-bar>
     </ion-header>
     <ion-item>
-    <ion-card>
-      <ion-card-content>
-        <p style="opacity: 102"> Her finner annonser der hvor de er postet fra, trykk på en for mer info</p>
-      </ion-card-content>
-    </ion-card>
+      <ion-card>
+        <ion-card-content>
+          <p style="opacity: 102"> Her finner annonser der hvor de er postet fra, trykk på en for mer info</p>
+        </ion-card-content>
+      </ion-card>
     </ion-item>
     <ion-content :fullscreen="true">
       <capacitor-google-map id="map"></capacitor-google-map>

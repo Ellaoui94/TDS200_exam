@@ -32,7 +32,7 @@ import {
 import {ref} from 'vue';
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 import {authService, directus} from "@/services/directus.service";
-import IRetroGamePosts from "@/Interface/IRetroGamePosts"
+import IRetroGamePosts from "@/Interface/IRetroGamePost"
 import {useRouter} from "vue-router";
 
 // Bruker auth_token for å sjekke om brukeren er logget inn eller ikke, lag til mer detaljert forklaring på template delen
@@ -108,7 +108,6 @@ const handleChange = async (event: CustomEvent) => {
 }
 
 `)
-
   if (filterResponse.status === 200 && filterResponse.data) {
     retroGamePosts.value = [...filterResponse.data.retroGames_posts];
   }
@@ -129,7 +128,6 @@ const handleChange = async (event: CustomEvent) => {
             <ion-icon slot="icon-only" :icon="mapOutline"/>
           </ion-button>
         </ion-buttons>
-        <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" /> <!--Forklart i typescript-->
         <ion-progress-bar v-if="retroGamePosts.length <= 0" :buffer="0.001"></ion-progress-bar> <!--Skal kun vises når fetch arrayet av posts er tomt-->
       </ion-toolbar>
     </ion-header>
@@ -140,6 +138,7 @@ const handleChange = async (event: CustomEvent) => {
                                refreshing-spinner="circles"
                                refreshing-text="Refreshing..."></ion-refresher-content>
       </ion-refresher>
+      <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" /> <!--Forklart i typescript-->
       <ion-card>
         <ion-card-content>
           <p>Velkommen til NostalgiShop! Her kan du se på annonser som er lagt ut! Om du ønsker å legge ut

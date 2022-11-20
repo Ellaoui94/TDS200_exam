@@ -31,3 +31,7 @@ interface IRetroGamePost {
         }
     }
 }
+
+interface IRetroGamePosts {
+    retroGames_posts: IRetroGamePost[]
+}

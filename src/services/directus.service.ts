@@ -17,7 +17,7 @@ export const authService = {
             email,
             password,
             avatar,
-            role: "33686bc6-3b6b-438c-ad00-f3f51b018fbe"
+            role: "d4e6742f-4c66-4eaa-a0c1-0118090b7134"
         });
 
         return !!createUserResult?.email
@@ -27,7 +27,7 @@ export const authService = {
     },
     async currentUser(){
         return await directus.users.me.read({
-            fields: ['id', 'email', 'first_name', 'avatar']
+            fields: ['id', 'email', 'first_name', 'avatar', 'status']
         });
     }
 }

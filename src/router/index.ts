@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/newPost',
     name: 'NewPost',
     component: NewPostPage,
-    beforeEnter: [authenticationRequiredRouteGuard]
+    beforeEnter: [authenticationRequiredRouteGuard] //lagt til denne linjen for å sjekke om brukeren er logget inn før man går videre, hvis ikke, send dem til hjemme siden
   },
   {
     path: '/auth',
@@ -70,6 +70,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/postChat/:id/:email',
     name: 'PostChatPage',
     component: PostChatPage,
+    beforeEnter: [authenticationRequiredRouteGuard]
   },
   {
     path: '/userPage',

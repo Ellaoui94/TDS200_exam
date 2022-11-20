@@ -18,20 +18,24 @@ import {
   IonPage,
   IonProgressBar,
   IonToolbar,
+  IonTitle,
   onIonViewDidEnter
 } from "@ionic/vue";
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import IRetroGamePosts from "@/Interface/IRetroGamePosts";
+import IRetroGamePosts from "@/Interface/IRetroGamePost";
+import IPostChats from "@/Interface/IPostChat"
 import RetroGamePostCard from "@/components/RetroGamePostCard.vue";
 
 const currentUser = ref({});
 const router = useRouter();
 const isModalOpen = ref(false);
 
-const retroGamePosts = ref<IRetroGamePosts>([]);
+const retroGamePosts = ref<IRetroGamePosts>([]); // laget ref for alle modellene i directus som blir brukt av brukeren
+const retroGamePostsChat = ref<IPostChats>([]);
+const retroGamePostsComments = ref([]);
 
-
+// fetcher alt som brukeren har lagt ut for å kunne hente idene deres så jeg kan slette de
 const fetchRetroGamePosts = async () => {
   const response = await directus.graphql.items<IRetroGamePosts>(`
  query MyQuery {
@@ -58,12 +62,55 @@ const fetchRetroGamePosts = async () => {
 }
 
 
+const fetchRetroGameChatIDs = async () => {
+  const response = await directus.graphql.items<IRetroGamePosts>(`
+query MyQuery {
+  retroGames_post_chat(filter: {user_created: {email: {_eq: "${currentUser.value.email}"}}}) {
+    id
+  }
+}
+
+`)
+
+  if (response.status === 200 && response.data) {
+    retroGamePostsChat.value = [...response.data.retroGames_post_chat];
+  }
+}
+
+
+const fetchRetroGameMessageIDs = async () => {
+  const response = await directus.graphql.items<IRetroGamePosts>(`
+query MyQuery {
+  retroGames_post_comments(filter: {user_created: {email: {_eq: "${currentUser.value.email}"}}}) {
+    id
+  }
+}
+
+`)
+
+  if (response.status === 200 && response.data) {
+    retroGamePostsComments.value = [...response.data.retroGames_post_comments];
+  }
+}
+
 onIonViewDidEnter(async () => {
   currentUser.value = await authService.currentUser();
   await fetchRetroGamePosts();
+  await fetchRetroGameChatIDs();
+  await fetchRetroGameMessageIDs();
 })
 
+//her så sletter alt innhold og brukeren ved å bruke id-ene
 const deleteCurrentUser = async () => {
+  retroGamePosts.value.map(async (post) => {
+    await directus.items('retroGames_posts').deleteMany([post.id])
+  })
+  retroGamePostsComments.value.map(async (comment) => {
+    await directus.items('retroGames_post_comments').deleteMany([comment.id])
+  })
+  retroGamePostsChat.value.map(async (msg) => {
+    await directus.items('retroGames_post_chat').deleteMany([msg.id])
+  })
   await directus.users.deleteOne(currentUser.value.id);
   localStorage.removeItem('auth_token');
   location.reload();
@@ -74,6 +121,8 @@ const updatedUser = ref({
   first_name: '',
   email: '',
 })
+
+// har en modal hvor brukeren kan endre infoen sin som lukker seg etter denne funksjonen har blitt kalt på
 const updateCurrentUser = async () => {
   await directus.users.updateOne(currentUser.value.id, {
     first_name: updatedUser.value.first_name,
@@ -84,6 +133,7 @@ const updateCurrentUser = async () => {
 }
 
 const presentActionSheet = async () => {
+  //Brukeren for en popup hvis han velger "Slett" knappen som kjører slette funksjonen
   const actionSheet = await actionSheetController.create({
     header: 'Brukeren din og all innhold blir slettet permanent',
     buttons: [
@@ -110,6 +160,7 @@ const presentActionSheet = async () => {
   if (res.data.action == "delete") {
     await deleteCurrentUser();
   }
+
 };
 </script>
 
@@ -120,12 +171,12 @@ const presentActionSheet = async () => {
         <ion-buttons slot="start">
           <ion-back-button router-link="/"></ion-back-button>
         </ion-buttons>
-        <ion-progress-bar v-if="!currentUser.avatar" :buffer="0.001"></ion-progress-bar>
+        <ion-progress-bar v-if="!currentUser.avatar" :buffer="0.001"></ion-progress-bar> <!--Siden bilde tar tid å laste opp, så må vi ha if for at siden ikke skal kræsje-->
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-avatar>
-        <img :src="`https://7qp4jl4l.directus.app/assets/${currentUser.avatar}`"/>
+        <img :src="`https://7qp4jl4l.directus.app/assets/${currentUser.avatar}`" alt="userImg"/>
       </ion-avatar>
       <ion-card>
         <ion-card-header>
@@ -165,7 +216,8 @@ const presentActionSheet = async () => {
             <ion-label position="floating">Nytt navn:</ion-label>
             <ion-input type="text" placeholder="Navn" v-model="updatedUser.first_name"/>
             <ion-label position="floating">Email:</ion-label>
-            <ion-input type="text" v-on:keyup.enter="updateCurrentUser" v-model="updatedUser.email" placeholder="Email"/>
+            <ion-input type="text" v-on:keyup.enter="updateCurrentUser" v-model="updatedUser.email"
+                       placeholder="Email"/>
             <ion-button @click="updateCurrentUser" style="width: 100%; margin-top: 100px" class="modalBtn">
               Endre
             </ion-button>
@@ -183,7 +235,7 @@ ion-avatar {
   height: 50%;
 }
 
-h1, h3{
+h1, h3 {
   color: #ffffff;
 }
 

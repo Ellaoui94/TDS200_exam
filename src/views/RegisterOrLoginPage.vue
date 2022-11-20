@@ -28,11 +28,10 @@ let segmentDefMode = ref('login');
 const isLoading = ref(false);
 const router = useRouter();
 
-onIonViewDidLeave(()=> {
+onIonViewDidLeave(()=> { //noen ganger så blir dataen fra API-et ikke fetchet, ikke ideelt, men dette var løsningen for nå
   location.reload();
 })
 
-//Trenger kanskje ikke interface????????????
 const userDetails = ref<IUserDetails>({
   firstName: '',
   email: '',
@@ -56,13 +55,24 @@ const login = async () => {
   }
 }
 
+const openCamera = async () => {
+  const pic = await Camera.getPhoto({
+    quality: 100,
+    allowEditing: false,
+    resultType: CameraResultType.Uri
+  })
+  if (pic.webPath) {
+    segmentDefMode.value = 'register'; //når knappen blir trykket på og bilde blir tatt, så går siden tilbake til login, dette tvinger den til å være i registrer
+    userDetails.value.avatar.id = pic.webPath
+  }
+}
 
 const register = async () => {
   isLoading.value = true
   try {
     let res = await fetch(userDetails.value.avatar.id)
 
-    // explain this
+    // hvis bilde ikke blir tatt så er segment fortsatt på login, så da blir profilbilde til bilde som jeg henter fra ts filen i components mappen
     if (segmentDefMode.value === 'login') {
       res = await fetch(defaultUserImage);
       const imgBlob = await res.blob();
@@ -97,21 +107,10 @@ const register = async () => {
   }
 }
 
-
-const openCamera = async () => {
-  const pic = await Camera.getPhoto({
-    quality: 100,
-    allowEditing: false,
-    resultType: CameraResultType.Uri
-  })
-  if (pic.webPath) {
-    segmentDefMode.value = 'register';
-    userDetails.value.avatar.id = pic.webPath
-  }
-}
 </script>
 
 <template>
+  <!--Koden her er ganske rettfram, så la kunn til en kommentar-->
   <ion-page>
     <ion-content>
       <ion-list>
@@ -133,8 +132,8 @@ const openCamera = async () => {
           Velg fil 🖼 eller ta et bilde 📸
         </ion-button>
 
-        <img class="hero-image" v-if="!registerMode" src="../../public/assets/defaultUser.png"/>
-        <img class="hero-image" v-if="registerMode && userDetails.avatar.id" :src="userDetails.avatar.id"/>
+        <img class="hero-image" v-if="!registerMode" src="../../public/assets/defaultUser.png" alt="userImg"/>
+        <img class="hero-image" v-if="registerMode && userDetails.avatar.id" :src="userDetails.avatar.id" alt="userImg"/>
         <ion-button v-if="registerMode && userDetails.avatar.id" @click="openCamera">Endre bilde 🔄</ion-button>
 
         <hr/>
@@ -151,7 +150,7 @@ const openCamera = async () => {
 
         <ion-item>
           <ion-label class="label-mild" position="floating">Passord</ion-label>
-          <ion-input v-if="!registerMode" v-on:keyup.enter="login" type="password" v-model="userDetails.password"/>
+          <ion-input v-if="!registerMode" v-on:keyup.enter="login" type="password" v-model="userDetails.password"/> <!-- fikset slik at man kan trykke på enter istedenfor å være avhenign av knappen -->
           <ion-input v-if="registerMode" v-on:keyup.enter="register" type="password" v-model="userDetails.password"/>
         </ion-item>
 

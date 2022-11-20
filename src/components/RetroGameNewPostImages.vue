@@ -8,16 +8,11 @@ interface Props{
 
 const props = defineProps<Props>();
 
+//Hvert bilde får en col for å kunne vise bildene i en grid
 </script>
 
 <template>
   <ion-col>
-    <img :src="`${imageSrc}`"/>
+    <img :src="`${imageSrc}`" alt="newImg"/>
   </ion-col>
 </template>
-
-<style scoped>
-ion-slide{
-  height: 300px;
-}
-</style>

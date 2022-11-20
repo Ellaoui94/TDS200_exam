@@ -168,7 +168,7 @@ printCurrentPosition().then((s) => {
           et bilde 📸
         </ion-button>
 
-        <!--Bilder som blir lagt til i arrayet vises gjennom en grid -->
+        <!--Bilder som blir lagt til i arrayet vises gjennom en grid, hvert bilde for en ion-col -->
         <ion-grid v-if="newRetroGamePostImages.length">
           <ion-row>
             <retro-game-new-post-images v-for="image in newRetroGamePostImages" :key="image"

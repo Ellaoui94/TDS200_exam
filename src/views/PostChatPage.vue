@@ -21,10 +21,15 @@ import {
 import {useRoute} from "vue-router";
 import {authService, directus} from "@/services/directus.service";
 import {sendSharp} from "ionicons/icons";
+import IPostChat from "@/Interface/IPostChat"
 import {ref} from "vue";
 
+/*
+På denne siden har jeg bare prøvd meg fram og kommet fram til en greit nok fungerende løsning
+Vil ikke si meg fornøyd og det er mye som må forbedres og fikses på, men det får gå for nå
+*/
 const route = useRoute();
-const {id, email} = route.params;
+const {id, email} = route.params; //Henter både id og email fra posten sitt parameter, for å kunne filtrere queryen
 
 const isLoading = ref(false);
 const newMessageText = ref('');
@@ -36,9 +41,9 @@ const allMessagesArray = ref([]);
 const currentUser = ref({});
 
 const loadChat = async () => {
-  currentUser.value = await authService.currentUser();
+  currentUser.value = await authService.currentUser(); //Henter brukeren som er pålogget for filtrereing av queryen
 
-  const postOwnerMessageResponse = await directus.graphql.items(`
+  const postOwnerMessageResponse = await directus.graphql.items<IPostChat>(`
 query MyQuery {
   retroGames_posts_by_id(id: "${id}") {
     retroGame_post_chat_fk(filter: {user_created: {email: {_eq: "${email}"}}}) {
@@ -56,7 +61,9 @@ query MyQuery {
 }
  `);
 
-  const postCustomerMessageResponse = await directus.graphql.items(`
+  //filtrere etter bruker som er pålogget akkurat nå og eieren av posten som man er inni
+
+  const postCustomerMessageResponse = await directus.graphql.items<IPostChat>(`
  query MyQuery {
   retroGames_posts_by_id(id: "${id}") {
     retroGame_post_chat_fk(filter: {user_created: {email: {_eq: "${currentUser.value.email}"}}}) {
@@ -82,16 +89,17 @@ query MyQuery {
     postCustomerChat.value = [...postCustomerMessageResponse.data.retroGames_posts_by_id.retroGame_post_chat_fk];
   }
 
-
+//Hvis en kunde ikke har sendt noe melding, så skal ikke eieren ha noe melding heller PS: Ikke fornøyd med dette
   if (postCustomerChat.value.length == 0) {
     postOwnerChat.value = [];
   }
 
-  allMessagesArray.value = postOwnerChat.value.concat(postCustomerChat.value);
+  allMessagesArray.value = postOwnerChat.value.concat(postCustomerChat.value); //Merger begge arrayene inni et
 
   allMessagesArray.value.sort(
       (owner, customer) => Number(new Date(owner.date_created)) - Number(new Date(customer.date_created)),
   );
+  //sorterer de etter dato
 
   isLoading.value = false
 }
@@ -100,10 +108,10 @@ const addNewMessage = async () => {
     try {
       await directus.items('retroGames_post_chat').createOne({
         message: newMessageText.value,
-        retroGames_post_fk: id,
+        retroGames_post_fk: id, // legger til en melding og posten sitt id
       })
     } catch (e) {
-      if (e.message == "You don't have permission to access this.") {
+      if (e.message == "You don't have permission to access this.") { //for å gjøre feilmeldingen til norsk
         await (await toastController.create({
           message: `Du må være innlogget `,
           duration: 3000,
@@ -128,6 +136,7 @@ onIonViewDidEnter(async () => {
   await loadChat();
 })
 
+// For å oppdatere meldinger, ikke fornøyd med dette heller
 setInterval(async () => {
   await loadChat();
 }, 5000);
@@ -137,7 +146,7 @@ setInterval(async () => {
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>test</ion-title>
+        <ion-title>Meldinger</ion-title>
         <ion-button router-link="/" slot="start">Tilbake</ion-button>
       </ion-toolbar>
       <ion-progress-bar v-if="isLoading" :buffer="0.001"></ion-progress-bar>
