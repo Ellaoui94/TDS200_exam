@@ -132,13 +132,13 @@ const handleChange = async (event: CustomEvent) => {
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-refresher slot="fixed" pull-factor="0.8" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)"> <!--Forklart i typescript-->
+      <ion-refresher slot="fixed" pull-factor="0.8" pull-min="100" pull-max="200" @ionRefresh="doRefresh($event)"> <!--Forklart i script-->
         <ion-refresher-content :pulling-icon="chevronDownCircleOutline"
                                pulling-text="Pull to refresh"
                                refreshing-spinner="circles"
                                refreshing-text="Refreshing..."></ion-refresher-content>
       </ion-refresher>
-      <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" /> <!--Forklart i typescript-->
+      <ion-searchbar show-clear-button="focus" placeholder="Søk på tittel"  :debounce="200" @ionChange="handleChange($event)" /> <!--Forklart i script-->
       <ion-card>
         <ion-card-content>
           <p>Velkommen til NostalgiShop! Her kan du se på annonser som er lagt ut! Om du ønsker å legge ut
