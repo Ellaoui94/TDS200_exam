@@ -179,12 +179,12 @@ printCurrentPosition().then((s) => {
 
 
         <ion-item>
-          <ion-label position="floating">Tittel</ion-label>
+          <ion-label position="floating">Tittel:</ion-label>
           <ion-input type="text" v-model="newRetroGamePost.title"></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-label position="floating">Description</ion-label>
+          <ion-label position="floating">Beskrivelse:</ion-label>
           <ion-textarea v-model="newRetroGamePost.description"></ion-textarea>
         </ion-item>
 
